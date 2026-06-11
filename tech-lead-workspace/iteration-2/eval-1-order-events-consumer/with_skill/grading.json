@@ -1,0 +1,140 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-order-projections.md is the single TDD file in outputs/"
+    },
+    {
+      "text": "Before drafting, the assistant explicitly acknowledges having read the PRD with a one-line summary",
+      "passed": true,
+      "evidence": "Header references PRD: '**Related PRD:** `/Users/nhoze/.claude/skills/tech-lead/evals/prd-order-events-consumer.md` (\"Real-time Order Status Projections\", Marcus Webb, 2026-06-02)' and the Problem section restates PRD specifics (5s polling, ~120 RPS, 14 event types, 24 partitions, Sept 30 holiday deadline, BACKWARDS compatibility)."
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Word count: 6308 words"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '## 1. Problem & context'"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '## 2. Scope' with subheaders '**In scope**' and '**Out of scope (explicit non-goals from PRD or deliberate cuts)**'"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '## 3. High-level approach' includes a prose diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '## 4. Detailed design' with subsections 4a-4j covering broker/topic, delivery semantics, offsets, DLQ, concurrency, back-pressure, stateful processing, schema evolution, storage choice, read API"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '## 5. Alternatives considered' includes storage alternatives (DynamoDB, Spanner, Postgres, Redis) and consumer pattern alternatives (Kafka Streams, Flink, read-side projection) plus 'Do nothing', each with verdict/pros/cons"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section '## 6. Non-functional requirements' with concrete targets: 'Read API: 99.9% monthly', 'Read API: p99 < 50 ms', 'End-to-end producer->projection: p95 < 2 s', 'DLQ rate budget: < 0.1%'"
+    },
+    {
+      "text": "NFRs section visibly accounts for every NFR — either a target or explicit 'N/A — reason'",
+      "passed": true,
+      "evidence": "Section 6 explicitly states 'Walking `references/nfrs-checklist.md` in order' and covers Scalability, Reliability & availability, Resilience, Performance, Observability, Security, Cost, Compliance & privacy, Deployment & operations, Disaster recovery, Maintainability, Extensibility - each with concrete content"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '## 7. Risks & failure modes' with a table of 9 risks including likelihood, blast radius, mitigation, recovery"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section '## 8. Rollout & migration' with Phase 0-5, rollback plan"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section '## 9. Observability & operations' plus dedicated Observability subsection in NFRs with specific metrics like kafka_consumer_lag_records, events_processed_total, dynamodb_conditional_check_failed_total"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '## 11. Open questions' contains 12 entries (Kafka retention, event volume, producer config, sequence_no, gap strategy, DLQ retention, etc.)"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "Only placeholder reference '<link to runbook — to be added>' used; no fabricated internal URLs found"
+    },
+    {
+      "text": "TDD is structured as an event-driven / streaming consumer design",
+      "passed": true,
+      "evidence": "Entire design is structured around Kafka consumer group, partition assignment, consumer pods, offset commits, DLQ topic, replay; section 4 details broker/topic model, delivery semantics, offset/checkpoint management, poison-message handling, concurrency, back-pressure"
+    },
+    {
+      "text": "Explicitly states delivery semantics and what makes effects idempotent",
+      "passed": true,
+      "evidence": "Section 4b explicitly states 'At-least-once delivery' and 'effectively-once projection updates' achieved via per-order sequence_no + DynamoDB conditional write: 'ConditionExpression: last_applied_sequence_no = :expected'"
+    },
+    {
+      "text": "Discusses per-partition ordering and partition key choice (order_id)",
+      "passed": true,
+      "evidence": "Section 4a: 'Topic: orders.events.v1, 24 partitions, key = order_id'; section 4b: 'Per-partition ordering. Because the topic is keyed by order_id, all events for a single order land on a single partition'"
+    },
+    {
+      "text": "Specifies a consumer lag SLO with a concrete number",
+      "passed": true,
+      "evidence": "'alert at lag > 5 K records for 5 min OR lag > 30 min of wall time'; 'we tolerate up to 5 min of staleness during recovery'; 'Page: consumer lag > 30 min wall-time'"
+    },
+    {
+      "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path",
+      "passed": true,
+      "evidence": "Section 4d: trigger ('3 retries with exponential backoff... Immediate DLQ on deterministic errors: schema deserialization failure, unknown event type, state-machine rejection'), DLQ destination ('Kafka topic orders.events.v1.dlq'), replay path ('ops dashboard (later phase) or a CLI that reads from the DLQ...re-injects to the main topic'), alarm thresholds specified"
+    },
+    {
+      "text": "Specifies offset commit strategy",
+      "passed": true,
+      "evidence": "Section 4c: 'Commit timing: after DynamoDB write succeeds AND state-machine apply returns. Never before.' 'Commit cadence: manual commit per batch of 100 records or 1 s, whichever comes first' and 'enable.auto.commit = false'"
+    },
+    {
+      "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs",
+      "passed": true,
+      "evidence": "Section 4i has principal-level take recommending DynamoDB with caveats; explicitly recommends Spanner if GCP-only ('My principal-level take: if \"GCP-only\" is even slightly the org norm, choose Spanner and stop'); section 5 table compares DynamoDB/Spanner/Postgres/Redis with verdicts"
+    },
+    {
+      "text": "Addresses Avro schema evolution under BACKWARDS compatibility",
+      "passed": true,
+      "evidence": "Section 4h Schema evolution: 'Compatibility mode: BACKWARDS (per PRD). New consumer can read old events. We can add optional fields freely; we cannot remove or rename fields without a topic version bump.' Also addresses new event types and breaking-change topic version bump"
+    },
+    {
+      "text": "Addresses out-of-order event handling within partition",
+      "passed": true,
+      "evidence": "Section 4b extensively discusses out-of-order causes (rebalancing redelivery, producer-side reordering) and uses sequence_no + apply rules (apply/duplicate/gap) with strategies A (buffer-and-wait) and B (apply-and-reconcile, recommended)"
+    },
+    {
+      "text": "Designs back-fill / full-replay path",
+      "passed": true,
+      "evidence": "Section 4c Replay: 'Full back-fill (initial seed and disaster recovery): a separate seed consumer group on the same topic from earliest, run as a GKE Job with higher parallelism (24 pods, 1 per partition).' Per-order replay also designed"
+    },
+    {
+      "text": "Designs the GET /orders/{id}/projection read endpoint with latency target",
+      "passed": true,
+      "evidence": "Section 4j Read API designs 'GET /orders/{order_id}/projection' with eventually-consistent default, X-Consistent-Read header, Caffeine cache, 200/404/503 responses; latency target in NFRs: 'Read API: p99 < 50 ms (per PRD)'"
+    }
+  ],
+  "summary": {
+    "passed": 26,
+    "failed": 0,
+    "total": 26,
+    "pass_rate": 1.0
+  }
+}

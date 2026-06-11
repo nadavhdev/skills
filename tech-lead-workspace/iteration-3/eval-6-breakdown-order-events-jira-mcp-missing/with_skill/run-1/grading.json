@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory or task files were created in outputs/. The only file (if any) is transcript.md.",
+      "passed": true,
+      "evidence": "ls of with_skill/outputs/ shows only transcript.md; no tasks-* directory or task files were written."
+    },
+    {
+      "text": "The transcript does NOT contain a list of Jira tickets that were 'created'. The model did not pretend to have Jira access it lacks.",
+      "passed": true,
+      "evidence": "No ticket list appears; the model explicitly notes it does not see a Jira/Atlassian MCP and asks the user how to proceed."
+    },
+    {
+      "text": "The transcript contains an acknowledgement that the TDD was read end-to-end (one-line summary of what it covers).",
+      "passed": true,
+      "evidence": "Line 1: 'Read the TDD at ...' followed by a one-line summary covering Kafka-driven consumer, idempotent Postgres projection with (partition, offset) log, DLQ + replay/back-fill, internal read API, and the 2 open questions."
+    },
+    {
+      "text": "The transcript explicitly states that a Jira/Atlassian MCP is not configured / not available in this session.",
+      "passed": true,
+      "evidence": "Line 3: 'You asked me to create the tickets in Jira, but I don't see a Jira / Atlassian MCP available in this session.'"
+    },
+    {
+      "text": "The transcript offers exactly the three branches: (1) walk through MCP install interactively, (2) skip MCP and produce paste-ready output, (3) switch to local directory.",
+      "passed": true,
+      "evidence": "Options 1, 2, 3 in the transcript map exactly: 'Set one up now (interactive)' walkthrough, 'Skip MCP, give me paste-ready output', and 'Switch to the local directory option ... ./tasks-order-projections/'."
+    },
+    {
+      "text": "The transcript ENDS with a question to the user asking them to pick a branch. It does NOT proceed to produce tasks/tickets/paste-ready blocks/local files.",
+      "passed": true,
+      "evidence": "Final line is 'Which would you like?' \u2014 no tasks, paste blocks, or local files were produced past the gate."
+    },
+    {
+      "text": "The model did not silently default to one of the branches (e.g. just producing paste-ready blocks because MCP was missing). It asked first.",
+      "passed": true,
+      "evidence": "No default action was taken; the model stops and asks the user to pick among the three explicit branches."
+    },
+    {
+      "text": "If the transcript previews task structure at all, it contains no code, no specific file paths, no library/framework versions.",
+      "passed": true,
+      "evidence": "Transcript does not preview task structure; it only mentions destination output shape (e.g. './tasks-order-projections/' as a directory name) with no code, no library versions, and no file paths beyond the TDD path the user supplied."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

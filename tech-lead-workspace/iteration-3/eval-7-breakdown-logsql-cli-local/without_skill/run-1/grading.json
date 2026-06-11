@@ -1,0 +1,105 @@
+{
+  "expectations": [
+    {
+      "text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.",
+      "passed": true,
+      "evidence": "Directory `without_skill/outputs/tasks-logsql/` exists containing 12 task files + README.md."
+    },
+    {
+      "text": "The tasks directory contains a README.md index.",
+      "passed": true,
+      "evidence": "`tasks-logsql/README.md` is present with wave ordering, dependency notes, and open-question call-out."
+    },
+    {
+      "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+      "passed": true,
+      "evidence": "Directory contains exactly 13 files (12 task files numbered 01\u201312 + README.md) \u2014 at the upper bound."
+    },
+    {
+      "text": "Task count is at least 4 (excluding README).",
+      "passed": true,
+      "evidence": "12 task files (01-scaffold through 12-distribution), well above the floor."
+    },
+    {
+      "text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.",
+      "passed": false,
+      "evidence": "Task files use a different schema: Outcome / Why / Acceptance criteria / Out of scope / Dependencies. None of the files contain 'One-liner', 'Composes', or 'TDD sections addressed' fields."
+    },
+    {
+      "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+      "passed": false,
+      "evidence": "Task 01 acceptance criteria includes shell commands `go test ./...`, `go vet`, `golangci-lint run`, `make build`, and `file logsql`; task 11 references `make bench`; task 12 includes `brew install logsql && logsql --version`."
+    },
+    {
+      "text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).",
+      "passed": false,
+      "evidence": "Task 01 acceptance criteria: '`cmd/logsql/main.go` exists and prints a stub `logsql vX.Y.Z` when run.' \u2014 explicit source-file-path reference."
+    },
+    {
+      "text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.",
+      "passed": true,
+      "evidence": "Go is treated as a settled decision throughout (e.g. 'Go module skeleton', 'go.mod declares the module'); no language-choice deliverable."
+    },
+    {
+      "text": "No task asks to decide parser strictness. The TDD already decided strict.",
+      "passed": true,
+      "evidence": "Task 02 references parser strictness as 'the core UX contract' (settled); no task asks to decide strictness."
+    },
+    {
+      "text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.",
+      "passed": true,
+      "evidence": "Tests appear as acceptance-criteria items inside feature tasks (e.g. 'Unit tests cover...'), not as a primary deliverable. No standalone test task exists."
+    },
+    {
+      "text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.",
+      "passed": false,
+      "evidence": "Task 01 is titled '01 \u2014 Project scaffold and build' with outcome 'A Go module skeleton that produces a statically-linked `logsql` binary'; acceptance includes 'go.mod declares the module', '`cmd/logsql/main.go` exists and prints a stub'. It explicitly disclaims 'Any actual SQL/parsing/execution code' \u2014 pure scaffolding, no shippable feature."
+    },
+    {
+      "text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.",
+      "passed": false,
+      "evidence": "Tasks are textbook horizontal layers: 02-parser, 03-jsonl-input (reader), 04-operator-pipeline (framework), 05-streaming-ops (filter/project/limit), 06-aggregate, 07-sort, 08-output-writers (CSV+JSON), 09-cli-shell. The README even confirms the layered shape with 04 depending on 02 (AST) + 03 (rows) feeding into 05/06/07/08."
+    },
+    {
+      "text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.",
+      "passed": false,
+      "evidence": "First task is '01 \u2014 Project scaffold and build' producing only a stub binary printing `logsql vX.Y.Z`; out-of-scope explicitly excludes 'Any actual SQL/parsing/execution code'. No end-to-end SELECT/WHERE/LIMIT flow is delivered until many tasks later."
+    },
+    {
+      "text": "No task is a standalone 'address performance' / 'memory budget' / 'cold-start latency' line item. NFRs ride with feature tasks in their acceptance criteria.",
+      "passed": false,
+      "evidence": "Task 11 is titled '11 \u2014 NFR benchmarks in CI' \u2014 a standalone cold-start + throughput NFR task. (Memory budgets do ride with tasks 06/07, but the standalone NFR-benchmarks task violates the rule.)"
+    },
+    {
+      "text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.",
+      "passed": true,
+      "evidence": "Task 09 (cli-shell) acceptance: '`1` \u2014 query ran, **zero rows matched**' explicitly listed with new-convention documentation requirement in --help and README."
+    },
+    {
+      "text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.",
+      "passed": true,
+      "evidence": "Task 06: 'returns a typed error naming **the operator (`aggregate`) and the offending column / group key**... Exit code 3'. Task 07: 'typed error naming the operator (`sort`) and the column list being sorted. Exit code 3'."
+    },
+    {
+      "text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.",
+      "passed": true,
+      "evidence": "README has 'Open question to resolve before wave 4' section stating 'Open question 1 in the TDD... must be resolved with the platform team before task 02-parser is closed'. Transcript also calls it out. No invented task for the open question."
+    },
+    {
+      "text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.",
+      "passed": true,
+      "evidence": "Transcript: 'I read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md` and broke it into 12 task files...'."
+    },
+    {
+      "text": "The chat summary names the local directory destination and the task count.",
+      "passed": true,
+      "evidence": "Transcript names destination `./tasks-logsql/` and 'broke it into 12 task files (plus a README)'."
+    }
+  ],
+  "summary": {
+    "passed": 12,
+    "failed": 7,
+    "total": 19,
+    "pass_rate": 0.6316
+  }
+}

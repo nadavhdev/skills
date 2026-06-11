@@ -1,0 +1,28 @@
+{
+  "eval_id": 0,
+  "eval_name": "referral-api-tdd",
+  "prompt": "hey can you do a TDD for the referral code feature, PRD is at /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md - we need to get this out the door fast for the q3 launch and i want a solid principal-level design doc i can take into review with the staff engineers tomorrow. write the TDD as a file in the current directory.",
+  "assertions": [
+    {"id": "file_exists",           "text": "A single TDD-*.md file exists in the outputs/ directory"},
+    {"id": "min_word_count",        "text": "Document is at least 1500 words"},
+    {"id": "has_problem_context",   "text": "Contains a 'Problem' / 'Context' / 'Background' section"},
+    {"id": "has_scope",             "text": "Contains a 'Scope' section with both in-scope and out-of-scope items"},
+    {"id": "has_high_level",        "text": "Contains a 'High-level approach' / 'Overview' section"},
+    {"id": "has_detailed_design",   "text": "Contains a 'Detailed design' section with substantive content"},
+    {"id": "has_alternatives",      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each"},
+    {"id": "has_nfrs",              "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)"},
+    {"id": "has_risks",             "text": "Contains a 'Risks' / 'Failure modes' section"},
+    {"id": "has_rollout",           "text": "Contains a 'Rollout' / 'Migration' section"},
+    {"id": "has_observability",     "text": "Contains an 'Observability' / 'Operations' section"},
+    {"id": "has_open_questions",    "text": "Contains 'Open questions' with at least one entry"},
+    {"id": "no_fabricated_urls",    "text": "Contains no fabricated/invented URLs to internal systems (only placeholders or PRD-mentioned references are acceptable)"},
+    {"id": "category_api_serving",  "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)"},
+    {"id": "covers_data_model",     "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes"},
+    {"id": "covers_idempotency",    "text": "Explicitly addresses idempotency of the redemption call (idempotency key, dedup table, conditional write, or equivalent)"},
+    {"id": "covers_fraud",          "text": "Addresses fraud / self-referral / multi-account abuse prevention (referenced as design concern, not punted)"},
+    {"id": "covers_activation",     "text": "Defines or constrains what 'activation' means (e.g., first paid subscription start) and the credit-issuance trigger flow"},
+    {"id": "covers_code_collision", "text": "Addresses code-collision / generation strategy (random + uniqueness check, deterministic from user ID, etc.)"},
+    {"id": "covers_latency_budget", "text": "Has a concrete latency budget for the API (numbers, not 'fast')"},
+    {"id": "covers_billing_integ",  "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails"}
+  ]
+}

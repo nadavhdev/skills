@@ -1,0 +1,115 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-referral-code-api.md exists in outputs/"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document is ~5009 words (wc -w)"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem statement and context' explains the referral program need and existing systems"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section 2 has explicit 'In scope (this TDD)' and 'Out of scope' subsections with multiple items each"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '4. High-level approach' with architecture diagram and core flow"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '5. Detailed design' covers code generation, redemption flow, activation flow, deep links, data model, fraud, activation consumption"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '7. Alternatives considered' lists 9 alternatives with explicit 'Why not' rejection rationale (e.g., 'Build into Users service', 'Sequential codes', 'Poll Stripe')"
+    },
+    {
+      "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section '8. Non-functional requirements' with concrete numbers: 99.9% availability, p99 < 200ms, 500 RPS peak, < 5 min lag SLO"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '9. Risks and failure modes' table with R1-R10 risks, likelihood, impact, and mitigation"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section '11. Rollout / migration plan' with 10-week phased rollout from schema deployment to public launch"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section 8.6 'Observability' with metrics/logs/traces/alerts, and Section 13 'Operations / runbooks'"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '14. Open questions' has 12 numbered open questions (provider choice, code expiry, FX, etc.)"
+    },
+    {
+      "text": "Contains no fabricated/invented URLs to internal systems (only placeholders or PRD-mentioned references are acceptable)",
+      "passed": true,
+      "evidence": "Only example URL 'https://refr.app.example/r/ABCDEF' which uses .example TLD as placeholder; no fabricated internal company URLs"
+    },
+    {
+      "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)",
+      "passed": true,
+      "evidence": "Section '6. API contracts' details GET/POST endpoints with JSON request/response shapes, error codes, JWT/mTLS auth model"
+    },
+    {
+      "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes",
+      "passed": true,
+      "evidence": "Section 5.5 provides SQL DDL for referral_codes (PK user_id), referrals (PK id, UNIQUE referred_user_id), referral_events with explicit CREATE INDEX statements"
+    },
+    {
+      "text": "Explicitly addresses idempotency of the redemption call (idempotency key, dedup table, conditional write, or equivalent)",
+      "passed": true,
+      "evidence": "Section 5.3 uses deterministic idempotency keys 'referral:{referral_id}:referrer' and Billing dedupes server-side; UNIQUE constraint on referred_user_id enforces dedupe at DB level"
+    },
+    {
+      "text": "Addresses fraud / self-referral / multi-account abuse prevention (referenced as design concern, not punted)",
+      "passed": true,
+      "evidence": "Section 5.6 'Fraud / abuse controls (v1)' lists 7 concrete controls: self-referral block, rate limits, device/IP/payment fingerprint heuristics, daily cap, kill switch, manual review queue"
+    },
+    {
+      "text": "Defines or constrains what 'activation' means (e.g., first paid subscription start) and the credit-issuance trigger flow",
+      "passed": true,
+      "evidence": "Activation defined as 'first paid subscription start' and Section 5.3 details the consumer flow: Billing emits account.activated -> state PENDING->ACTIVATING->CREDITED via Billing credit API"
+    },
+    {
+      "text": "Addresses code-collision / generation strategy (random + uniqueness check, deterministic from user ID, etc.)",
+      "passed": true,
+      "evidence": "Section 5.1: random 6-char from 30-char alphabet (7.29e8 combinations), UNIQUE constraint with retry-on-conflict up to 5 times, CSPRNG via secrets.token_urlsafe"
+    },
+    {
+      "text": "Has a concrete latency budget for the API (numbers, not 'fast')",
+      "passed": true,
+      "evidence": "Section 8.1 capacity table: GET /referral/me p99 150ms, POST /redeem p99 200ms, GET preview p99 100ms; engineering goal 'p99 < 200ms for the mobile-hot endpoints'"
+    },
+    {
+      "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails",
+      "passed": true,
+      "evidence": "Section 5.3 step 7: 'On any failure (4xx not retryable, 5xx retryable) state stays ACTIVATING, message goes back on the queue with backoff; DLQ after N retries'; Section 8.3 degradation modes for Billing API down"
+    }
+  ],
+  "summary": {
+    "passed": 21,
+    "failed": 0,
+    "total": 21,
+    "pass_rate": 1.0
+  }
+}

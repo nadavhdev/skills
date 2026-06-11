@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "logsql-cli-tdd",
+  "prompt": "Write me a TDD for the logsql CLI tool, PRD at /Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md. I want the design to take a real stance on the things engineers will fight about (Go vs Python, parser strictness, schema-on-read vs config) instead of punting all of them. Output as a .md file in the current dir.",
+  "assertions": [
+    {"id": "file_exists",              "text": "A single TDD-*.md file exists in the outputs/ directory"},
+    {"id": "acknowledges_prd",         "text": "Before drafting, the assistant explicitly acknowledges having read the PRD with a one-line summary"},
+    {"id": "min_word_count",           "text": "Document is at least 1500 words"},
+    {"id": "has_problem_context",      "text": "Contains a 'Problem' / 'Context' / 'Background' section"},
+    {"id": "has_scope",                "text": "Contains a 'Scope' section with both in-scope and out-of-scope items"},
+    {"id": "has_high_level",           "text": "Contains a 'High-level approach' / 'Overview' section"},
+    {"id": "has_detailed_design",      "text": "Contains a 'Detailed design' section with substantive content"},
+    {"id": "has_alternatives",         "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale"},
+    {"id": "has_nfrs",                 "text": "Contains an NFRs section with concrete targets"},
+    {"id": "nfrs_explicit_na",         "text": "NFRs section visibly accounts for every NFR — either a target or explicit 'N/A — reason' (CLI should have many N/As here, written out)"},
+    {"id": "has_risks",                "text": "Contains a 'Risks' / 'Failure modes' section"},
+    {"id": "has_rollout",              "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)"},
+    {"id": "has_open_questions",       "text": "Contains 'Open questions' with at least one entry"},
+    {"id": "no_fabricated_urls",       "text": "No fabricated/invented URLs"},
+    {"id": "category_cli",             "text": "TDD is structured as a CLI utility design"},
+    {"id": "command_surface_sketch",   "text": "Sketches the command surface with flags / args / --help shape"},
+    {"id": "exit_codes_defined",       "text": "Defines exit codes"},
+    {"id": "stdin_pipe_behavior",      "text": "Documents STDIN / pipe composition behavior"},
+    {"id": "streaming_decision",       "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations"},
+    {"id": "output_format_selection",  "text": "Specifies output formats and how the user selects between them"},
+    {"id": "go_vs_python_position",    "text": "Takes an explicit position on Go vs Python with stated tradeoffs"},
+    {"id": "parser_strictness_pos",    "text": "Takes an explicit position on SQL parser strictness with reasoning"},
+    {"id": "alternatives_jq_duckdb",   "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk"},
+    {"id": "perf_budget",              "text": "Addresses the 5s/1GB-compressed performance target with a real plan"}
+  ]
+}

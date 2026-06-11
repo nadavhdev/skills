@@ -1,0 +1,125 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-logsql-cli.md exists in outputs/ directory"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Word count is 4889 words, well above the 1500 threshold"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem & context' present, discussing INC-4421 and DX survey"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '2. Scope' explicitly lists 'In scope (v1)' and 'Out of scope (explicit, with reason)'"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '3. High-level approach' with one-paragraph summary and ASCII diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '4. Detailed design' covers command surface, exit codes, STDIN, memory/streaming, schema, parser, error reporting, dependencies"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '5. Alternatives considered' lists Go vs Python vs Rust, DuckDB vs SQLite vs custom vs DataFusion, schema strategy, parser strictness, output format, do-nothing — each with rejection rationale"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section 6 with targets like '< 5 s on a 1 GB gzipped input', '≤ 512 MB RSS', '4 GB' default max memory, 'p95 wall-clock... regresses > 20%'"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '7. Risks & failure modes' with a detailed table of risks, likelihood, mitigation, recovery"
+    },
+    {
+      "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)",
+      "passed": true,
+      "evidence": "Section '8. Rollout & migration' covers Homebrew, GitHub Release, semver, phased adoption (alpha/dogfood/GA)"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '10. Open questions' contains 10 numbered open questions"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "No invented internal URLs; only references to incident IDs (INC-4421), Sigstore cosign, CycloneDB, and channels like #devtools/#oncall"
+    },
+    {
+      "text": "TDD is structured as a CLI utility design",
+      "passed": true,
+      "evidence": "Header explicitly states 'Workload category: CLI utility'; design centers on command surface, exit codes, STDIN, distribution"
+    },
+    {
+      "text": "Sketches the command surface with flags / args / --help shape",
+      "passed": true,
+      "evidence": "Section 4a includes a full sketched --help with Usage, Arguments, Flags (--format, --schema-hint, --max-memory, --temp-dir, --explain, etc.), and Exit codes"
+    },
+    {
+      "text": "Defines exit codes (incl. any tool-specific codes as a deliberate design choice)",
+      "passed": true,
+      "evidence": "Section 4b defines exit codes 0-5 with table; explicit design stance to NOT overload exit code with 'no rows found' unlike grep"
+    },
+    {
+      "text": "Documents STDIN / pipe composition behavior (reads stdin when no files; works in pipelines)",
+      "passed": true,
+      "evidence": "Section 4c: 'cat file.jsonl | logsql' works; 'Interactive TTY with no input → exit 2'; mixed stdin + files documented"
+    },
+    {
+      "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations (GROUP BY / ORDER BY)",
+      "passed": true,
+      "evidence": "Section 4d: 'Non-aggregating queries: ≤ 512 MB resident'; 'Aggregating queries: ≤ --max-memory resident (default 4 GB); spills to disk beyond'"
+    },
+    {
+      "text": "Specifies output formats and how the user selects between them (--json/--csv/--tsv/etc.)",
+      "passed": true,
+      "evidence": "'-f, --format <json|csv|tsv|table>' flag with TTY-aware default (json when piped, table when TTY)"
+    },
+    {
+      "text": "Takes an explicit position on Go vs Python with stated tradeoffs (does not punt to 'either is fine')",
+      "passed": true,
+      "evidence": "Section 5: 'Chosen: Go' with reasoning — single static binary, broken python toolchains, cross-compilation, DuckDB wheel size; Python rejected explicitly"
+    },
+    {
+      "text": "Takes an explicit position on SQL parser strictness with reasoning",
+      "passed": true,
+      "evidence": "Section 4f: 'Decision: hand DuckDB the SQL... Strict by DuckDB's standards, not by ANSI's; no forgiving mode' with stated reasons against lenient parsing"
+    },
+    {
+      "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk, or similar — with honest rejection rationale",
+      "passed": true,
+      "evidence": "Section 5 explicitly compares DuckDB (chosen) vs SQLite vs custom vs Apache DataFusion; also Do-nothing alternative discussing status quo jq|grep|awk chains"
+    },
+    {
+      "text": "Explicitly omits NFRs that do not apply to a CLI (availability SLO, multi-region, disaster recovery) — states the omission rather than fabricating values",
+      "passed": true,
+      "evidence": "Section 6 has 'NFRs explicitly omitted' subsection: 'Availability SLO: N/A — it's a CLI'; 'Disaster recovery: N/A — no persistent state'; 'Multi-region: N/A — local tool'"
+    },
+    {
+      "text": "Addresses the 5s/1GB-compressed performance target with a real plan",
+      "passed": true,
+      "evidence": "Performance NFR: 'Target: time-to-first-result < 5 s on a 1 GB gzipped input on 2024-era M-series MBP'; mechanism is DuckDB streaming scan with vectorised execution; verification via 'make bench' nightly with > 20% regression failure"
+    }
+  ],
+  "summary": {
+    "passed": 23,
+    "failed": 0,
+    "total": 23,
+    "pass_rate": 1.0
+  }
+}

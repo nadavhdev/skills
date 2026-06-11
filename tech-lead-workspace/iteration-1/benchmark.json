@@ -1,0 +1,1130 @@
+{
+  "metadata": {
+    "skill_name": "tech-lead",
+    "skill_path": "/Users/nhoze/.claude/skills/tech-lead",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-06-09T16:14:54Z",
+    "evals_run": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 21,
+        "failed": 0,
+        "total": 21,
+        "time_seconds": 239.3,
+        "tokens": 44966,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-referral-code-api.md exists in outputs/ directory"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Word count: 5051 words"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem & context' covers consumer app, MAU, marketing deadline"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section '2. Scope' has explicit 'In scope' and 'Out of scope' subsections"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '3. High-level approach' covers code lifecycle, redemption attribution, credit issuance with ASCII diagram"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section '4. Detailed design' has 10 subsections (4a-4j) covering API surface, data access, latency, fraud, etc."
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section '5. Alternatives considered' lists 6 alternatives each with rejection rationale (own microservice, Stripe Coupons, deterministic hashids, server-side attribution, synchronous credit, vendor)"
+        },
+        {
+          "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section '6. Non-functional requirements' includes 99.9% monthly availability, p95 120ms read/200ms write, 500 RPS burst, 4M MAU at 12 months"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section '7. Risks & failure modes' enumerates 9 risks with likelihood, blast radius, mitigation, recovery"
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section",
+          "passed": true,
+          "evidence": "Section '8. Rollout & migration' has Phase 0-3 timeline, backwards compat, rollback story"
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section '9. Observability & operations' enumerates pages/tickets/daily, plus Observability NFR subsection with metrics, logs, traces, alerts table"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section '10. Open questions' has 10 entries, 3 marked [BLOCKER]"
+        },
+        {
+          "text": "Contains no fabricated/invented URLs to internal systems (only placeholders or PRD-mentioned references are acceptable)",
+          "passed": true,
+          "evidence": "Only placeholder '<link to referrals runbook \u2014 to be added>' and a path reference to the PRD file; no invented company URLs"
+        },
+        {
+          "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)",
+          "passed": true,
+          "evidence": "Section 4a has full endpoint table with Method/Path/Auth/Purpose; section 4b explicitly covers AuthN (JWT) and AuthZ (row-level)"
+        },
+        {
+          "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes",
+          "passed": true,
+          "evidence": "Section 4c includes SQL DDL for referrals.codes, referrals.redemptions, referrals.credit_receipts, referrals.stats with PRIMARY KEY and explicit indexes (redemptions_referrer_idx, redemptions_status_idx)"
+        },
+        {
+          "text": "Explicitly addresses idempotency of the redemption call (idempotency key, dedup table, conditional write, or equivalent)",
+          "passed": true,
+          "evidence": "Redemption idempotent on PK (referee_user_id), INSERT ... ON CONFLICT pattern; credit_receipts table with idempotency_key column 'referral:activate:{redemption_id}:referrer'"
+        },
+        {
+          "text": "Addresses fraud / self-referral / multi-account abuse prevention (referenced as design concern, not punted)",
+          "passed": true,
+          "evidence": "Section 4h 'Fraud guardrails' lists 4 explicit rules: self-network (device/IP/payment match), velocity per referrer, velocity per IP/device, trial-abuse signal"
+        },
+        {
+          "text": "Defines or constrains what 'activation' means (e.g., first paid subscription start) and the credit-issuance trigger flow",
+          "passed": true,
+          "evidence": "Section 4g 'Credit issuance' details consumer for subscription.activated event with 5-step flow: lookup, fraud check, transactional update, ledger call, ack"
+        },
+        {
+          "text": "Addresses code-collision / generation strategy (random + uniqueness check, deterministic from user ID, etc.)",
+          "passed": true,
+          "evidence": "Section 4c: 'secrets.token_bytes mapped to the alphabet and rely on the UNIQUE constraint to detect collisions; on conflict we retry up to 5 times. After 5 retries we widen to 7 chars'"
+        },
+        {
+          "text": "Has a concrete latency budget for the API (numbers, not 'fast')",
+          "passed": true,
+          "evidence": "Section 4d: 'p95 \u2264 120 ms end-to-end for GET /referrals/me, p95 \u2264 200 ms for POST /v1/referrals/redemptions' with per-stage table (TLS 10ms, JWT 3ms, Redis 2ms, Postgres 20ms)"
+        },
+        {
+          "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails",
+          "passed": true,
+          "evidence": "Section 4g step 4-5 and 4i: 'If step 4 fails after step 3 committed: the receipts table records intent; on next event-redelivery (or manual retry via runbook) we re-issue using the same idempotency key'; ledger row in dependency table"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "time_seconds": 226.7,
+        "tokens": 44595,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-order-projections.md exists in outputs/ directory"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document is approximately 4500+ words spanning 10 substantial sections"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem & context' describes polling waste, lag, and driver (holiday ramp)"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section '2. Scope' has both 'In scope' (Kafka consumer, read API, DLQ, etc.) and 'Out of scope' (order service replacement, cross-order aggregations, etc.)"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '3. High-level approach' describes the Kotlin service on GKE with consumer + read API, includes prose diagram"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section '4. Detailed design' has 11 subsections (4a-4k) covering broker model, delivery semantics, offsets, DLQ, concurrency, back-pressure, state, schema evolution, data model, read API, dependencies"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section '5. Alternatives considered' covers Spanner, Postgres, DynamoDB, Redis, Kafka Streams/ksqlDB, scaling order service, and doing nothing \u2014 each with verdict"
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section '6. Non-functional requirements' has concrete numbers: read API p99<50ms, end-to-end p95<2s, consumer lag p95<30s, DLQ rate <0.01%"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section '7. Risks & failure modes' has 8 risks with likelihood, blast radius, mitigation, recovery columns"
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section",
+          "passed": true,
+          "evidence": "Section '8. Rollout & migration' has 4 phases plus rollback and data backfill plans"
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section '9. Observability & operations' plus extensive Observability subsection in \u00a76 covering metrics, logs, traces, alerts"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section '10. Open questions' has 10 entries with [BLOCKER]/[IMPORTANT]/[NORMAL] severity"
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "Uses placeholders like '<link to runbook \u2014 to be added>' and only references the PRD path; no invented internal URLs"
+        },
+        {
+          "text": "TDD is structured as an event-driven / streaming consumer design",
+          "passed": true,
+          "evidence": "Header explicitly says 'Workload category: Event-driven / streaming consumer (Kafka)' and design is centered on Kafka consumer group with partition-level workers"
+        },
+        {
+          "text": "Explicitly states delivery semantics (at-least-once + idempotent processing) and what makes effects idempotent",
+          "passed": true,
+          "evidence": "Section 4b states 'At-least-once delivery. Duplicates happen on producer retry...' and defines effectively-once via event_version + conditional CAS write: 'if event.version <= P.applied_version: drop (duplicate)'"
+        },
+        {
+          "text": "Discusses per-partition ordering and partition key choice (order_id) and what that buys",
+          "passed": true,
+          "evidence": "Section 4b: 'Within one partition, messages are strictly ordered... Since partitioning is by order_id, all events for a single order land on one partition and are therefore ordered'"
+        },
+        {
+          "text": "Specifies a consumer lag SLO with a concrete number",
+          "passed": true,
+          "evidence": "'Consumer lag SLO: p95 lag < 30s. p99 < 2min. Alert at p95 > 60s for 5min, page at p95 > 5min'"
+        },
+        {
+          "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path",
+          "passed": true,
+          "evidence": "Section 4d has table of DLQ triggers (schema_incompatible, illegal_transition, missing_version, gap_not_closed, apply_failed, store_write_failed), DLQ envelope schema, and replay tool 'ops/replay-order.sh order_id'"
+        },
+        {
+          "text": "Specifies offset commit strategy (after processing / batch / at-least-once semantics)",
+          "passed": true,
+          "evidence": "Section 4c: 'Auto-commit off. Manual commit after successful apply (or after DLQ). Commit cadence: per message... offsets are committed only after the conditional write succeeds'"
+        },
+        {
+          "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs, not punted",
+          "passed": true,
+          "evidence": "Section 5: Explicitly recommends Spanner over DynamoDB ('Not recommended on GCP-only'), Postgres ('Viable second choice'), Redis ('Rejected as primary store'). Section 3 states 'Recommendation: Spanner'"
+        },
+        {
+          "text": "Addresses Avro schema evolution under BACKWARDS compatibility",
+          "passed": true,
+          "evidence": "Section 4h: 'Schema Registry mode: BACKWARDS (already enforced). Adding a new optional field is always safe. Removing a field needs a forward migration... Breaking change \u2192 new topic orders.events.v2'"
+        },
+        {
+          "text": "Addresses out-of-order event handling within partition (sequence numbers / event-timestamp last-writer-wins / state-machine guards)",
+          "passed": true,
+          "evidence": "Section 4b defines event_version monotonic per order_id, with gap buffer: 'if event.version > P.applied_version + 1: park event in a per-order pending buffer... do NOT commit Kafka offset for this message yet \u2014 wait for the gap to close'"
+        },
+        {
+          "text": "Designs back-fill / full-replay path for initial seed and recovery",
+          "passed": true,
+          "evidence": "Section 8 'Data backfill: before Phase 3, run a one-time full backfill: bump the consumer group offset to earliest, let it grind through all retained history (~15min at 24 partitions in parallel). Conditional-write CAS makes this safe to repeat.' Plus replay tool in \u00a74d"
+        },
+        {
+          "text": "Designs the GET /orders/{id}/projection read endpoint with latency target",
+          "passed": true,
+          "evidence": "Section 4j: 'GET /orders/{order_id}/projection. Single Spanner point read by primary key. p99 < 10ms expected; p99 < 50ms SLO has comfortable headroom.' Response includes applied_version, last_event_time, 404 handling, auth"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "time_seconds": 249.3,
+        "tokens": 50541,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-vendor-inventory-sync.md exists at outputs/ path"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document is extensive, covering 10 sections with detailed subsections, easily exceeding 1500 words"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem & context' exists describing $80K/month CX incidents and stale Google Sheet"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section 2 has explicit 'In scope' and 'Out of scope' bullet lists"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '3. High-level approach' with pipeline diagram and three adapter pattern overview"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section 4 has subsections 4a-4h covering schedule, cursors, adapters, concurrency, processing, backpressure, data model, capacity"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section 5 lists 7 alternatives (A-G) including Airflow, webhooks, IMAP, Kafka, bypass catalog DB, each with rejection rationale"
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section 6 includes concrete numbers: p95 run < 5 min, 2x poll_cadence freshness, $500/month budget alert, 26h Vendor K staleness"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section 7 'Risks & failure modes' has a table with 12 risks (R1-R12) with likelihood, blast radius, mitigation, recovery"
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section, addressing the shadow-mode period from the PRD",
+          "passed": true,
+          "evidence": "Section 8 'Rollout & migration' includes 6-week phasing table and 'Shadow mode mechanics' with shadow_mode flag per vendor"
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section 9 'Observability & operations' has dashboards, alerts table (PagerDuty), and runbook items"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section 10 'Open questions' has 10 entries including catalog API idempotency, shadow-mode arbitration, discontinued SKU surface"
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "Only placeholder '<link to confluence runbook \u2014 to be added>' and example domain inventory-k@vendors.<our-domain> with explicit placeholder"
+        },
+        {
+          "text": "TDD is structured as a scheduled pull-based processing design",
+          "passed": true,
+          "evidence": "Section 0 explicitly states 'Dominant pattern: scheduled pull-based processing' referring to references/tdd-scheduled-pull.md"
+        },
+        {
+          "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email) \u2014 does not collapse them into 'all REST'",
+          "passed": true,
+          "evidence": "Sections 4c.1 (REST adapter, 8 vendors), 4c.2 (SFTP adapter, 3 vendors), 4c.3 (Email adapter, Vendor K) each have distinct treatments"
+        },
+        {
+          "text": "Proposes a per-vendor connector / adapter pattern (or equivalent abstraction) with shared core",
+          "passed": true,
+          "evidence": "Common 'InventorySource' interface with three adapter implementations; pull stages (fetch, normalise, diff, apply, audit) shared across all 12 vendors"
+        },
+        {
+          "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it",
+          "passed": true,
+          "evidence": "Section 4f dedicated to Vendor F: hourly cadence not 30-min, \u226455 calls per run with 5 headroom, chunked full-refresh across multiple hours"
+        },
+        {
+          "text": "Discusses per-vendor cursor / watermark / 'since' state, and how it's stored and recovered",
+          "passed": true,
+          "evidence": "Section 4b 'Cursor / watermark' defines vendor_sync_state table with last_cursor jsonb, adapter-specific cursor semantics, and recovery via S3 raw payloads"
+        },
+        {
+          "text": "Addresses no-overlap / locking between scheduled runs",
+          "passed": true,
+          "evidence": "Section 4d: 'Per-vendor lock: Redis SET NX PX', UUID-fenced; second Beat fire becomes no-op with skipped_due_to_lock_total metric"
+        },
+        {
+          "text": "Defines a freshness SLO and per-vendor stale-data alerting (24h+ stale = alarm)",
+          "passed": true,
+          "evidence": "NFR target: 'last_success_at no older than 2 \u00d7 poll_cadence (e.g. 60 min for a 30-min vendor; 26h for Vendor K). Breach = page on-call' via vendor_staleness_minutes metric"
+        },
+        {
+          "text": "Addresses storage and rotation of per-vendor credentials",
+          "passed": true,
+          "evidence": "Section 4c.1 and 6/Security: 'stored in AWS Secrets Manager, one secret per vendor. Rotated per vendor's own policy; rotation is operator-driven, no automatic rotation in v1'"
+        },
+        {
+          "text": "Has a concrete plan for the emailed-CSV vendor (e.g., dedicated mailbox, automated parser, quarantine for malformed)",
+          "passed": true,
+          "evidence": "Section 4c.3: dedicated SES inbound address, DMARC/SPF/DKIM enforcement, S3 archival, SES messageId dedup, quarantine to vendor-k-needs-triage/ S3 prefix, 26h staleness alarm"
+        },
+        {
+          "text": "Designs the shadow-mode rollout phase (compare to current source of truth, dispute resolution)",
+          "passed": true,
+          "evidence": "Section 8 Shadow mode mechanics: shadow_mode=true per vendor, applied=false audit rows, daily disagreement report compared with Google Sheet, ops arbitrates; Open Q2 names the arbiter"
+        },
+        {
+          "text": "Designs the audit log of inventory changes with source and timestamp",
+          "passed": true,
+          "evidence": "Section 4g defines InventoryAudit table with run_id, vendor_id, internal_sku, old_qty, new_qty, source_observed_at, applied_at, monthly partitions"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 23,
+        "failed": 0,
+        "total": 23,
+        "time_seconds": 222.3,
+        "tokens": 43027,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-logsql-cli.md exists in outputs/ directory"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Word count is 4889 words, well above the 1500 threshold"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem & context' present, discussing INC-4421 and DX survey"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section '2. Scope' explicitly lists 'In scope (v1)' and 'Out of scope (explicit, with reason)'"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '3. High-level approach' with one-paragraph summary and ASCII diagram"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section '4. Detailed design' covers command surface, exit codes, STDIN, memory/streaming, schema, parser, error reporting, dependencies"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section '5. Alternatives considered' lists Go vs Python vs Rust, DuckDB vs SQLite vs custom vs DataFusion, schema strategy, parser strictness, output format, do-nothing \u2014 each with rejection rationale"
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section 6 with targets like '< 5 s on a 1 GB gzipped input', '\u2264 512 MB RSS', '4 GB' default max memory, 'p95 wall-clock... regresses > 20%'"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section '7. Risks & failure modes' with a detailed table of risks, likelihood, mitigation, recovery"
+        },
+        {
+          "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)",
+          "passed": true,
+          "evidence": "Section '8. Rollout & migration' covers Homebrew, GitHub Release, semver, phased adoption (alpha/dogfood/GA)"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section '10. Open questions' contains 10 numbered open questions"
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "No invented internal URLs; only references to incident IDs (INC-4421), Sigstore cosign, CycloneDB, and channels like #devtools/#oncall"
+        },
+        {
+          "text": "TDD is structured as a CLI utility design",
+          "passed": true,
+          "evidence": "Header explicitly states 'Workload category: CLI utility'; design centers on command surface, exit codes, STDIN, distribution"
+        },
+        {
+          "text": "Sketches the command surface with flags / args / --help shape",
+          "passed": true,
+          "evidence": "Section 4a includes a full sketched --help with Usage, Arguments, Flags (--format, --schema-hint, --max-memory, --temp-dir, --explain, etc.), and Exit codes"
+        },
+        {
+          "text": "Defines exit codes (incl. any tool-specific codes as a deliberate design choice)",
+          "passed": true,
+          "evidence": "Section 4b defines exit codes 0-5 with table; explicit design stance to NOT overload exit code with 'no rows found' unlike grep"
+        },
+        {
+          "text": "Documents STDIN / pipe composition behavior (reads stdin when no files; works in pipelines)",
+          "passed": true,
+          "evidence": "Section 4c: 'cat file.jsonl | logsql' works; 'Interactive TTY with no input \u2192 exit 2'; mixed stdin + files documented"
+        },
+        {
+          "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations (GROUP BY / ORDER BY)",
+          "passed": true,
+          "evidence": "Section 4d: 'Non-aggregating queries: \u2264 512 MB resident'; 'Aggregating queries: \u2264 --max-memory resident (default 4 GB); spills to disk beyond'"
+        },
+        {
+          "text": "Specifies output formats and how the user selects between them (--json/--csv/--tsv/etc.)",
+          "passed": true,
+          "evidence": "'-f, --format <json|csv|tsv|table>' flag with TTY-aware default (json when piped, table when TTY)"
+        },
+        {
+          "text": "Takes an explicit position on Go vs Python with stated tradeoffs (does not punt to 'either is fine')",
+          "passed": true,
+          "evidence": "Section 5: 'Chosen: Go' with reasoning \u2014 single static binary, broken python toolchains, cross-compilation, DuckDB wheel size; Python rejected explicitly"
+        },
+        {
+          "text": "Takes an explicit position on SQL parser strictness with reasoning",
+          "passed": true,
+          "evidence": "Section 4f: 'Decision: hand DuckDB the SQL... Strict by DuckDB's standards, not by ANSI's; no forgiving mode' with stated reasons against lenient parsing"
+        },
+        {
+          "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk, or similar \u2014 with honest rejection rationale",
+          "passed": true,
+          "evidence": "Section 5 explicitly compares DuckDB (chosen) vs SQLite vs custom vs Apache DataFusion; also Do-nothing alternative discussing status quo jq|grep|awk chains"
+        },
+        {
+          "text": "Explicitly omits NFRs that do not apply to a CLI (availability SLO, multi-region, disaster recovery) \u2014 states the omission rather than fabricating values",
+          "passed": true,
+          "evidence": "Section 6 has 'NFRs explicitly omitted' subsection: 'Availability SLO: N/A \u2014 it's a CLI'; 'Disaster recovery: N/A \u2014 no persistent state'; 'Multi-region: N/A \u2014 local tool'"
+        },
+        {
+          "text": "Addresses the 5s/1GB-compressed performance target with a real plan",
+          "passed": true,
+          "evidence": "Performance NFR: 'Target: time-to-first-result < 5 s on a 1 GB gzipped input on 2024-era M-series MBP'; mechanism is DuckDB streaming scan with vectorised execution; verification via 'make bench' nightly with > 20% regression failure"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 0,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 21,
+        "failed": 0,
+        "total": 21,
+        "time_seconds": 224.5,
+        "tokens": 31794,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-referral-code-api.md exists in outputs/"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document is ~5009 words (wc -w)"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem statement and context' explains the referral program need and existing systems"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section 2 has explicit 'In scope (this TDD)' and 'Out of scope' subsections with multiple items each"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '4. High-level approach' with architecture diagram and core flow"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section '5. Detailed design' covers code generation, redemption flow, activation flow, deep links, data model, fraud, activation consumption"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section '7. Alternatives considered' lists 9 alternatives with explicit 'Why not' rejection rationale (e.g., 'Build into Users service', 'Sequential codes', 'Poll Stripe')"
+        },
+        {
+          "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section '8. Non-functional requirements' with concrete numbers: 99.9% availability, p99 < 200ms, 500 RPS peak, < 5 min lag SLO"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section '9. Risks and failure modes' table with R1-R10 risks, likelihood, impact, and mitigation"
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section",
+          "passed": true,
+          "evidence": "Section '11. Rollout / migration plan' with 10-week phased rollout from schema deployment to public launch"
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section 8.6 'Observability' with metrics/logs/traces/alerts, and Section 13 'Operations / runbooks'"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section '14. Open questions' has 12 numbered open questions (provider choice, code expiry, FX, etc.)"
+        },
+        {
+          "text": "Contains no fabricated/invented URLs to internal systems (only placeholders or PRD-mentioned references are acceptable)",
+          "passed": true,
+          "evidence": "Only example URL 'https://refr.app.example/r/ABCDEF' which uses .example TLD as placeholder; no fabricated internal company URLs"
+        },
+        {
+          "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)",
+          "passed": true,
+          "evidence": "Section '6. API contracts' details GET/POST endpoints with JSON request/response shapes, error codes, JWT/mTLS auth model"
+        },
+        {
+          "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes",
+          "passed": true,
+          "evidence": "Section 5.5 provides SQL DDL for referral_codes (PK user_id), referrals (PK id, UNIQUE referred_user_id), referral_events with explicit CREATE INDEX statements"
+        },
+        {
+          "text": "Explicitly addresses idempotency of the redemption call (idempotency key, dedup table, conditional write, or equivalent)",
+          "passed": true,
+          "evidence": "Section 5.3 uses deterministic idempotency keys 'referral:{referral_id}:referrer' and Billing dedupes server-side; UNIQUE constraint on referred_user_id enforces dedupe at DB level"
+        },
+        {
+          "text": "Addresses fraud / self-referral / multi-account abuse prevention (referenced as design concern, not punted)",
+          "passed": true,
+          "evidence": "Section 5.6 'Fraud / abuse controls (v1)' lists 7 concrete controls: self-referral block, rate limits, device/IP/payment fingerprint heuristics, daily cap, kill switch, manual review queue"
+        },
+        {
+          "text": "Defines or constrains what 'activation' means (e.g., first paid subscription start) and the credit-issuance trigger flow",
+          "passed": true,
+          "evidence": "Activation defined as 'first paid subscription start' and Section 5.3 details the consumer flow: Billing emits account.activated -> state PENDING->ACTIVATING->CREDITED via Billing credit API"
+        },
+        {
+          "text": "Addresses code-collision / generation strategy (random + uniqueness check, deterministic from user ID, etc.)",
+          "passed": true,
+          "evidence": "Section 5.1: random 6-char from 30-char alphabet (7.29e8 combinations), UNIQUE constraint with retry-on-conflict up to 5 times, CSPRNG via secrets.token_urlsafe"
+        },
+        {
+          "text": "Has a concrete latency budget for the API (numbers, not 'fast')",
+          "passed": true,
+          "evidence": "Section 8.1 capacity table: GET /referral/me p99 150ms, POST /redeem p99 200ms, GET preview p99 100ms; engineering goal 'p99 < 200ms for the mobile-hot endpoints'"
+        },
+        {
+          "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails",
+          "passed": true,
+          "evidence": "Section 5.3 step 7: 'On any failure (4xx not retryable, 5xx retryable) state stays ACTIVATING, message goes back on the queue with backoff; DLQ after N retries'; Section 8.3 degradation modes for Billing API down"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 1,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "time_seconds": 231.9,
+        "tokens": 31930,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-order-projections-service.md exists in outputs/ directory"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document is substantially longer than 1500 words, with 17 detailed sections including extensive prose, tables, and code blocks"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section 2 'Problem statement & scope' and Section 3 'Background and constraints (calibrated)'"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section 2.1 'What we are building' and 2.2 'What we are explicitly not building (this milestone)' enumerate both"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section 5 'High-level architecture' with full diagram and component breakdown"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Sections 6 'Consumer design' and 7 'Storage' provide deeply substantive detail including reducer model, CAS write pseudocode, schema DDL"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section 7.2 table compares DynamoDB, Spanner, Cloud SQL, Firestore, Bigtable, Redis with rejection rationale for each"
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section 4.2 lists NFR-1 read p99 < 50ms, NFR-2 freshness p95 < 2s, NFR-3 99.95% availability, NFR-6 backfill \u2264 2h"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section 12 'Failure modes and how we handle them' with detection/behavior/recovery table"
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section",
+          "passed": true,
+          "evidence": "Section 15 'Rollout plan' with 16-week milestone schedule and 15.1 'Rollback'"
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section 14 'Observability' with metrics, tracing, logs, SLOs, dashboards subsections"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section 16 'Open questions and dependencies' lists 11 specific entries including sequence field, producer idempotency, retention, PII"
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "No invented internal URLs; only the actual API path /orders/{order_id}/projection and admin endpoint are mentioned"
+        },
+        {
+          "text": "TDD is structured as an event-driven / streaming consumer design",
+          "passed": true,
+          "evidence": "Designed around Kafka topic consumption with one consumer group, partition workers, DLQ topic, and reducer over event stream"
+        },
+        {
+          "text": "Explicitly states delivery semantics (at-least-once + idempotent processing) and what makes effects idempotent",
+          "passed": true,
+          "evidence": "Section 3 states 'Delivery semantics: at-least-once. Duplicates are guaranteed; the consumer must be idempotent.' Section 6.3 details event_id dedup + last_applied_sequence CAS as idempotency mechanisms"
+        },
+        {
+          "text": "Discusses per-partition ordering and partition key choice (order_id) and what that buys",
+          "passed": true,
+          "evidence": "Section 3 notes 'topic is keyed by order_id and a single key always lands on a single partition; Kafka guarantees per-partition order.' Section 6.4 enforces one worker per partition"
+        },
+        {
+          "text": "Specifies a consumer lag SLO with a concrete number",
+          "passed": true,
+          "evidence": "NFR-2 freshness p95 < 2s with alert at 1.5s; NFR-3 'consumer lag < 30s' availability condition"
+        },
+        {
+          "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path",
+          "passed": true,
+          "evidence": "Section 6.6 defines orders.events.dlq.v1 with reason taxonomy (invalid_transition, sequence_gap_timeout, cas_storm, decode_error, unknown_event_type); replay path via \u00a78 tool"
+        },
+        {
+          "text": "Specifies offset commit strategy (after processing / batch / at-least-once semantics)",
+          "passed": true,
+          "evidence": "Section 6.7 'enable.auto.commit=false; we commit synchronously after successful store write'; Section 6.3 step 6 'Commit the Kafka offset only after the write succeeds'"
+        },
+        {
+          "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs, not punted",
+          "passed": true,
+          "evidence": "Section 7.3 explicitly recommends Cloud Spanner as primary, rejects DynamoDB (cross-cloud), and identifies Cloud SQL Postgres as fallback if cost vetoed"
+        },
+        {
+          "text": "Addresses Avro schema evolution under BACKWARDS compatibility",
+          "passed": true,
+          "evidence": "Section 11 'Schema evolution': 'Input events: governed by Confluent SR with BACKWARDS compat. The consumer is built against the latest schema; old events deserialize cleanly because new fields are optional with defaults.'"
+        },
+        {
+          "text": "Addresses out-of-order event handling within partition (sequence numbers / event-timestamp last-writer-wins / state-machine guards)",
+          "passed": true,
+          "evidence": "Section 6.2 mandates per-order_id monotonic sequence number; Section 6.3 uses sequence for staleness drop and CAS guard; Section 6.5 introduces park buffer for gaps"
+        },
+        {
+          "text": "Designs back-fill / full-replay path for initial seed and recovery",
+          "passed": true,
+          "evidence": "Section 8 covers single-order replay (8.1) and full backfill (8.2) with shadow-table approach and 2h throughput target"
+        },
+        {
+          "text": "Designs the GET /orders/{id}/projection read endpoint with latency target",
+          "passed": true,
+          "evidence": "Section 9 specifies the endpoint contract with auth, JSON response shape, 404/503 semantics, staleness headers; NFR-1 sets p99 < 50ms latency target"
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 2,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "time_seconds": 263.4,
+        "tokens": 34656,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "File TDD-vendor-inventory-sync.md exists in outputs/ directory."
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document spans 828 lines with substantive content across 14 sections; well over 1500 words."
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section '1. Problem statement' explains stale inventory and $80K/month oversold incidents."
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section 2 has 'In scope (this project)' and 'Explicitly out of scope (per PRD)' subsections."
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section '3. High-level approach' with pipeline diagram and key shape decisions."
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section '4. Detailed design' covers components, ingestion adapters, parsing, normalization, diff, sanity gates, apply, and staleness detection."
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section 7 table lists 7 alternatives (one adapter per vendor, Step Functions/Airflow, direct DB pull, no S3 staging, manual paste, asking Vendor K to switch to SFTP, webhook ingress) each with rejection rationale."
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section 8 NFRs with concrete numbers: 99.5% availability, <=15 min REST freshness, <=30 min SFTP/email, <$300/mo cost, 140K SKUs capacity."
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section '9. Failure modes and how the design handles them' has detailed table of 15+ failure scenarios."
+        },
+        {
+          "text": "Contains a 'Rollout' / 'Migration' section, addressing the shadow-mode period from the PRD",
+          "passed": true,
+          "evidence": "Section 10 'Rollout and migration' with Phase 3 dedicated to '2 weeks from PRD' shadow mode and rollback strategy."
+        },
+        {
+          "text": "Contains an 'Observability' / 'Operations' section",
+          "passed": true,
+          "evidence": "Section 8.6 covers Observability (Datadog metrics, logs, tracing, alerts) and Section 11 covers Operations (runbooks, reconciliation, weekly digest)."
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section 13 'Open questions' has 11 numbered items including catalog API surface, shadow-mode arbitration, Vendor F rate-limit strategy."
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "Only generic placeholders like s3://inventory-sync-raw/, vendor-k-inventory@inventory.ourdomain.com, and REST paths like /catalog/inventory; no fabricated internal URLs."
+        },
+        {
+          "text": "TDD is structured as a scheduled pull-based processing design",
+          "passed": true,
+          "evidence": "Section 3 explicitly states 'Pull-only' approach with Celery Beat scheduler driving per-vendor cadence; pipeline stages from ingest to apply."
+        },
+        {
+          "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email) \u2014 does not collapse them into 'all REST'",
+          "passed": true,
+          "evidence": "Section 4.2 has distinct subsections 4.2.1 REST adapter (8 vendors), 4.2.2 SFTP adapter (3 vendors), 4.2.3 Email adapter (Vendor K); each with tailored design."
+        },
+        {
+          "text": "Proposes a per-vendor connector / adapter pattern (or equivalent abstraction) with shared core",
+          "passed": true,
+          "evidence": "Defines IngestionAdapter Protocol with three implementations; 'Three ingestion adapters, one downstream pipeline. REST/SFTP/Email adapters differ only in how they produce a raw payload... Everything after that is shared code.'"
+        },
+        {
+          "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it",
+          "passed": true,
+          "evidence": "Section 4.2.1: 'Vendor F's 60 req/hour cap means we have to choose... Default plan: 2x daily full pulls for Vendor F, gives us ~30 reqs each, comfortably under cap with headroom for retries.' Plus per-vendor token bucket in Redis."
+        },
+        {
+          "text": "Discusses per-vendor cursor / watermark / 'since' state, and how it's stored and recovered",
+          "passed": true,
+          "evidence": "VendorRun table stores per-run state and raw_s3_keys; pagination 'streamed to S3 page-by-page... vendor's pagination state is recoverable'; Open Q5 asks about updated_since support; payload_dedupe ledger by SHA-256."
+        },
+        {
+          "text": "Addresses no-overlap / locking between scheduled runs",
+          "passed": true,
+          "evidence": "Section 4.2.1: 'Per-vendor concurrency: at most 1 in-flight run per vendor (enforced via SELECT FOR UPDATE SKIP LOCKED on VendorRun or a Redis lock).' Also failure-modes row on operator double-trigger."
+        },
+        {
+          "text": "Defines a freshness SLO and per-vendor stale-data alerting (24h+ stale = alarm)",
+          "passed": true,
+          "evidence": "Section 2 sets concrete SLOs (<=15 min REST, <=30 min SFTP/email); Section 4.8 Staleness detection runs every 15 min comparing against vendor.staleness_threshold (default 24h); Section 8.6 alerts sev2 when vendor_freshness_seconds > 24h."
+        },
+        {
+          "text": "Addresses storage and rotation of per-vendor credentials",
+          "passed": true,
+          "evidence": "Section 8.5 Security: 'Vendor credentials in AWS Secrets Manager, fetched at task start, never written to logs. config JSONB stores references to secrets, not secret values. SFTP: prefer key-based auth; keys provisioned per vendor.'"
+        },
+        {
+          "text": "Has a concrete plan for the emailed-CSV vendor (e.g., dedicated mailbox, automated parser, quarantine for malformed)",
+          "passed": true,
+          "evidence": "Section 4.2.3: dedicated mailbox vendor-k-inventory@inventory.ourdomain.com via SES inbound, SNS->SQS->Celery, acceptance rules (from-domain allowlist, subject regex, attachment types), quarantine bucket for failures with ops Slack ping, manual override path; ClamAV scanning."
+        },
+        {
+          "text": "Designs the shadow-mode rollout phase (compare to current source of truth, dispute resolution)",
+          "passed": true,
+          "evidence": "Phase 3 details 2-week shadow mode: 'Daily comparison report: today, new system would have changed X SKUs; Google Sheet recorded Y changes; here are the deltas. Ops reviews.' Plus apply_enabled config flag and Open Q2 for arbitration."
+        },
+        {
+          "text": "Designs the audit log of inventory changes with source and timestamp",
+          "passed": true,
+          "evidence": "inventory_audit table: 'Append-only audit of every change actually pushed to catalog' with run_id, vendor_id, sku, old_on_hand, new_on_hand, applied_at, source_observed_at. 2-year retention; DB user has INSERT, SELECT only."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 3,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9565217391304348,
+        "passed": 22,
+        "failed": 1,
+        "total": 23,
+        "time_seconds": 224.8,
+        "tokens": 31464,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A single TDD-*.md file exists in the outputs/ directory",
+          "passed": true,
+          "evidence": "TDD-logsql-cli.md exists in outputs/ directory"
+        },
+        {
+          "text": "Document is at least 1500 words",
+          "passed": true,
+          "evidence": "Document is substantially longer than 1500 words, with 15 numbered sections, code blocks, tables, and detailed prose across ~680 lines"
+        },
+        {
+          "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+          "passed": true,
+          "evidence": "Section 1 'Problem statement' describes the on-call workflow pain and INC-4421"
+        },
+        {
+          "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+          "passed": true,
+          "evidence": "Section 2 'Scope' includes 'In scope (v0.1)' and 'Out of scope (v0.1)' subsections"
+        },
+        {
+          "text": "Contains a 'High-level approach' / 'Overview' section",
+          "passed": true,
+          "evidence": "Section 4 'High-level architecture' with pipeline diagram (Sources -> Decoder -> Project -> Aggregator -> Encoder)"
+        },
+        {
+          "text": "Contains a 'Detailed design' section with substantive content",
+          "passed": true,
+          "evidence": "Section 5 'Detailed design' covers module layout, type system, SQL grammar EBNF, source resolution, JSON decoding strategy, aggregation, sort, encoders, config, error reporting"
+        },
+        {
+          "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+          "passed": true,
+          "evidence": "Section 10 covers Language (Go/Python/Rust/DuckDB/q-jq-dsq), Parser (ANTLR/goyacc/PEG/Pratt), Schema, and Execution model alternatives each with verdicts and rationale"
+        },
+        {
+          "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+          "passed": true,
+          "evidence": "Section 9 NFRs with concrete targets: <5s for 1GB compressed, ~4.2s budget breakdown, mem-limit 1GiB default, fuzz >=1 hour per release, 90% invocations <10s"
+        },
+        {
+          "text": "Contains a 'Risks' / 'Failure modes' section",
+          "passed": true,
+          "evidence": "Section 12 'Risks & failure modes' is a table with 8 risks, likelihoods, impacts, and mitigations"
+        },
+        {
+          "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)",
+          "passed": true,
+          "evidence": "Section 13 'Rollout & migration' has Phase 0-3 with v0.1 alpha, v0.5 beta, v1.0 GA, Homebrew tap, signed/notarized macOS, SLSA-2 Linux releases, rollback via pinned versions"
+        },
+        {
+          "text": "Contains 'Open questions' with at least one entry",
+          "passed": true,
+          "evidence": "Section 11 'Open questions' lists 8 items including JSON decoder choice, LIKE semantics, HLL precision, timestamp inference, brew tap location"
+        },
+        {
+          "text": "No fabricated/invented URLs to internal systems",
+          "passed": true,
+          "evidence": "No invented internal URLs; only generic references like 'devtools/homebrew-tap' and standard GitHub releases"
+        },
+        {
+          "text": "TDD is structured as a CLI utility design",
+          "passed": true,
+          "evidence": "Section 7 'CLI contract' with full flag list, positional args, exit codes; explicitly designed as a stateless CLI"
+        },
+        {
+          "text": "Sketches the command surface with flags / args / --help shape",
+          "passed": true,
+          "evidence": "Section 7 shows full flag list: -f/--format, -o/--output, --mem-limit, --max-line-size, --on-bad-row, --explain, --explain-analyze, -c/--config, -v/--verbose, --version, -h/--help"
+        },
+        {
+          "text": "Defines exit codes (incl. any tool-specific codes as a deliberate design choice)",
+          "passed": true,
+          "evidence": "Section 8 exit codes table: 0 success, 1 runtime, 2 usage, 3 resource limit, 130 SIGINT; explicitly rejects 'exit 1 if zero rows' as a deliberate choice"
+        },
+        {
+          "text": "Documents STDIN / pipe composition behavior (reads stdin when no files; works in pipelines)",
+          "passed": true,
+          "evidence": "Section 5.4: 'If no positional args: read STDIN. If STDIN is a TTY and no files: error'; Section 9.7 documents line-buffered vs fully-buffered pipe mode; appendix A4 shows gunzip|logsql pipeline"
+        },
+        {
+          "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations (GROUP BY / ORDER BY)",
+          "passed": true,
+          "evidence": "Section 4.2 Memory model: 'Streaming scan -> filter -> project is O(1) memory'; 'GROUP BY and ORDER BY are bounded by --mem-limit (default 1 GiB)' with spill to disk"
+        },
+        {
+          "text": "Specifies output formats and how the user selects between them (--json/--csv/--tsv/etc.)",
+          "passed": true,
+          "evidence": "Section 5.8 table of formats (json/csv/tsv/table), selected via -f/--format flag with auto default (table if TTY, ndjson otherwise)"
+        },
+        {
+          "text": "Takes an explicit position on Go vs Python with stated tradeoffs (does not punt to 'either is fine')",
+          "passed": true,
+          "evidence": "Section 3.1 'Language: Go' - explicit decision with rationale around 60-second install promise, pip UX, perf budget; Python rejected explicitly in 10.1 alternatives table"
+        },
+        {
+          "text": "Takes an explicit position on SQL parser strictness with reasoning",
+          "passed": true,
+          "evidence": "Section 3.2 'Parser strictness: Forgiving but typed' - hand-written Pratt parser, forgiving lexing but strict semantics, with explicit rejection of both 'strict ANSI' and 'looks like SQL'"
+        },
+        {
+          "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk, or similar \u2014 with honest rejection rationale",
+          "passed": true,
+          "evidence": "Section 10.1 includes DuckDB CLI ('Heavy dep ~50 MB, wrong defaults for ndjson logs') and q/jq/dsq ('q is CSV-first, jq isn't SQL, dsq requires schema and isn't streaming')"
+        },
+        {
+          "text": "Explicitly omits NFRs that do not apply to a CLI (availability SLO, multi-region, disaster recovery) \u2014 states the omission rather than fabricating values",
+          "passed": false,
+          "evidence": "Section 9.3 Reliability says 'No daemon, no state' but does not explicitly state DR/availability SLO/multi-region as 'not applicable'. While section 6 notes statelessness, there's no explicit omission statement like 'DR: not applicable; this is a CLI'"
+        },
+        {
+          "text": "Addresses the 5s/1GB-compressed performance target with a real plan",
+          "passed": true,
+          "evidence": "Section 9.1 has a detailed budget breakdown table: gzip 2.0s, line scan 0.4s, JSON tokenize 1.5s, filter+count 0.3s, output 0.01s, total ~4.2s with 15% headroom; plus pprof/benchstat plan and pgzip fallback"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 234.4,
+        "stddev": 12.2708,
+        "min": 222.3,
+        "max": 249.3
+      },
+      "tokens": {
+        "mean": 45782.25,
+        "stddev": 3281.9167,
+        "min": 43027,
+        "max": 50541
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.9891,
+        "stddev": 0.0217,
+        "min": 0.9565,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 236.15,
+        "stddev": 18.4858,
+        "min": 224.5,
+        "max": 263.4
+      },
+      "tokens": {
+        "mean": 32461.0,
+        "stddev": 1476.3563,
+        "min": 31464,
+        "max": 34656
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.01",
+      "time_seconds": "-1.8",
+      "tokens": "+13321"
+    }
+  },
+  "notes": []
+}

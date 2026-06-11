@@ -1,0 +1,105 @@
+{
+  "expectations": [
+    {
+      "text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.",
+      "passed": true,
+      "evidence": "Directory `with_skill/outputs/tasks-logsql-cli/` exists containing 8 task files + README.md."
+    },
+    {
+      "text": "The tasks directory contains a README.md index.",
+      "passed": true,
+      "evidence": "`tasks-logsql-cli/README.md` is present and includes summary, task table, dependency graph, and blocked-task section."
+    },
+    {
+      "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+      "passed": true,
+      "evidence": "Directory contains 9 files total (8 task files + README), well within the 5\u201313 range."
+    },
+    {
+      "text": "Task count is at least 4 (excluding README).",
+      "passed": true,
+      "evidence": "8 task files (01 through 08), exceeding the floor of 4."
+    },
+    {
+      "text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.",
+      "passed": true,
+      "evidence": "Each task file uses an H3 title plus bolded sections: `**One-liner:**`, `**Composes:**`, `**TDD sections addressed:**`, `**Depends on:**`, `**Acceptance criteria:**` (verified across all 8 files)."
+    },
+    {
+      "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+      "passed": true,
+      "evidence": "No ``` code fences in any task body (only the README has a dependency-graph fence). Acceptance criteria reference CLI invocations as user-behavior examples, not as scripts or commands to run."
+    },
+    {
+      "text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).",
+      "passed": true,
+      "evidence": "Grep for `cmd/logsql|pkg/|src/|main.go` against all task bodies returned no matches."
+    },
+    {
+      "text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.",
+      "passed": true,
+      "evidence": "Tasks treat Go as a settled decision (e.g. 'Single statically-linked Go binary'); no language-choice deliverable appears."
+    },
+    {
+      "text": "No task asks to decide parser strictness. The TDD already decided strict.",
+      "passed": true,
+      "evidence": "Parser strictness is only referenced as a settled TDD decision in the README's blocked-task discussion; no task asks to decide it."
+    },
+    {
+      "text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.",
+      "passed": true,
+      "evidence": "No standalone testing task; the benchmarks task (07) is an NFR-verification CI task with concrete throughput/cold-start gates, not a generic test-coverage task."
+    },
+    {
+      "text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.",
+      "passed": true,
+      "evidence": "Task 01 is a walking skeleton that ships `SELECT/WHERE/LIMIT` end-to-end with exit codes wired in \u2014 scaffolding is implicit in shipping the binary, not a separate task."
+    },
+    {
+      "text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.",
+      "passed": true,
+      "evidence": "Tasks are vertical feature slices: walking-skeleton, json-output-mode, schema-on-read/strict-mode, group-by-and-aggregates, order-by, explain+panic, benchmarks, distribution \u2014 not parser/executor/output-formatter layers."
+    },
+    {
+      "text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.",
+      "passed": true,
+      "evidence": "Task 01 title is 'Walking skeleton: SELECT / WHERE / LIMIT over JSON-lines to CSV'; acceptance criteria show `logsql 'SELECT level, msg FROM stdin WHERE level = \"error\" LIMIT 5' < access.jsonl` working end-to-end."
+    },
+    {
+      "text": "No task is a standalone 'address performance' / 'memory budget' / 'cold-start latency' line item. NFRs ride with feature tasks in their acceptance criteria.",
+      "passed": false,
+      "evidence": "Task 07 ('Performance benchmarks in CI: cold-start and throughput') is a standalone NFR task wiring both cold-start (<100ms) and throughput (1 GB/60s) targets into CI. Memory budgets do ride with features (tasks 04 and 05), but the standalone NFR-benchmarks task violates this rule."
+    },
+    {
+      "text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.",
+      "passed": true,
+      "evidence": "Task 01 Composes: 'Exit-code contract wired in: `0`... `1` on successful execution with zero rows matched (new convention\u2014documented in --help and README)... `2`... `3`'; acceptance criteria assert exit 1 on zero matches."
+    },
+    {
+      "text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.",
+      "passed": true,
+      "evidence": "Task 04 acceptance: GROUP BY exceeding `--max-memory` 'exits 3 with a STDERR message naming `aggregate` as the offending operator'; Task 05: sort buffer exceeding budget 'exits 3... naming `sort` as the offending operator'."
+    },
+    {
+      "text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.",
+      "passed": true,
+      "evidence": "README has explicit 'Blocked: string functions + `CASE`' section quoting TDD \u00a710 and stating 'A 9th task... is **not written** in this breakdown'; transcript also calls this out as a blocked task."
+    },
+    {
+      "text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.",
+      "passed": true,
+      "evidence": "Transcript opens: 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md`. Covers a Go CLI for SQL-subset queries over JSON-lines logs...' summarizing TDD contents end-to-end."
+    },
+    {
+      "text": "The chat summary names the local directory destination and the task count.",
+      "passed": true,
+      "evidence": "Transcript: 'Local directory: `./tasks-logsql-cli/` in the working dir, one markdown file per task plus a README.md index. 8 deliverable task files + 1 README...'."
+    }
+  ],
+  "summary": {
+    "passed": 18,
+    "failed": 1,
+    "total": 19,
+    "pass_rate": 0.9474
+  }
+}

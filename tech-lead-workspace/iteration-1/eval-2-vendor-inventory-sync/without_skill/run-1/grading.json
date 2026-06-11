@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "File TDD-vendor-inventory-sync.md exists in outputs/ directory."
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document spans 828 lines with substantive content across 14 sections; well over 1500 words."
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem statement' explains stale inventory and $80K/month oversold incidents."
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section 2 has 'In scope (this project)' and 'Explicitly out of scope (per PRD)' subsections."
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '3. High-level approach' with pipeline diagram and key shape decisions."
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '4. Detailed design' covers components, ingestion adapters, parsing, normalization, diff, sanity gates, apply, and staleness detection."
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section 7 table lists 7 alternatives (one adapter per vendor, Step Functions/Airflow, direct DB pull, no S3 staging, manual paste, asking Vendor K to switch to SFTP, webhook ingress) each with rejection rationale."
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section 8 NFRs with concrete numbers: 99.5% availability, <=15 min REST freshness, <=30 min SFTP/email, <$300/mo cost, 140K SKUs capacity."
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '9. Failure modes and how the design handles them' has detailed table of 15+ failure scenarios."
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section, addressing the shadow-mode period from the PRD",
+      "passed": true,
+      "evidence": "Section 10 'Rollout and migration' with Phase 3 dedicated to '2 weeks from PRD' shadow mode and rollback strategy."
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section 8.6 covers Observability (Datadog metrics, logs, tracing, alerts) and Section 11 covers Operations (runbooks, reconciliation, weekly digest)."
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section 13 'Open questions' has 11 numbered items including catalog API surface, shadow-mode arbitration, Vendor F rate-limit strategy."
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "Only generic placeholders like s3://inventory-sync-raw/, vendor-k-inventory@inventory.ourdomain.com, and REST paths like /catalog/inventory; no fabricated internal URLs."
+    },
+    {
+      "text": "TDD is structured as a scheduled pull-based processing design",
+      "passed": true,
+      "evidence": "Section 3 explicitly states 'Pull-only' approach with Celery Beat scheduler driving per-vendor cadence; pipeline stages from ingest to apply."
+    },
+    {
+      "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email) — does not collapse them into 'all REST'",
+      "passed": true,
+      "evidence": "Section 4.2 has distinct subsections 4.2.1 REST adapter (8 vendors), 4.2.2 SFTP adapter (3 vendors), 4.2.3 Email adapter (Vendor K); each with tailored design."
+    },
+    {
+      "text": "Proposes a per-vendor connector / adapter pattern (or equivalent abstraction) with shared core",
+      "passed": true,
+      "evidence": "Defines IngestionAdapter Protocol with three implementations; 'Three ingestion adapters, one downstream pipeline. REST/SFTP/Email adapters differ only in how they produce a raw payload... Everything after that is shared code.'"
+    },
+    {
+      "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it",
+      "passed": true,
+      "evidence": "Section 4.2.1: 'Vendor F's 60 req/hour cap means we have to choose... Default plan: 2x daily full pulls for Vendor F, gives us ~30 reqs each, comfortably under cap with headroom for retries.' Plus per-vendor token bucket in Redis."
+    },
+    {
+      "text": "Discusses per-vendor cursor / watermark / 'since' state, and how it's stored and recovered",
+      "passed": true,
+      "evidence": "VendorRun table stores per-run state and raw_s3_keys; pagination 'streamed to S3 page-by-page... vendor's pagination state is recoverable'; Open Q5 asks about updated_since support; payload_dedupe ledger by SHA-256."
+    },
+    {
+      "text": "Addresses no-overlap / locking between scheduled runs",
+      "passed": true,
+      "evidence": "Section 4.2.1: 'Per-vendor concurrency: at most 1 in-flight run per vendor (enforced via SELECT FOR UPDATE SKIP LOCKED on VendorRun or a Redis lock).' Also failure-modes row on operator double-trigger."
+    },
+    {
+      "text": "Defines a freshness SLO and per-vendor stale-data alerting (24h+ stale = alarm)",
+      "passed": true,
+      "evidence": "Section 2 sets concrete SLOs (<=15 min REST, <=30 min SFTP/email); Section 4.8 Staleness detection runs every 15 min comparing against vendor.staleness_threshold (default 24h); Section 8.6 alerts sev2 when vendor_freshness_seconds > 24h."
+    },
+    {
+      "text": "Addresses storage and rotation of per-vendor credentials",
+      "passed": true,
+      "evidence": "Section 8.5 Security: 'Vendor credentials in AWS Secrets Manager, fetched at task start, never written to logs. config JSONB stores references to secrets, not secret values. SFTP: prefer key-based auth; keys provisioned per vendor.'"
+    },
+    {
+      "text": "Has a concrete plan for the emailed-CSV vendor (e.g., dedicated mailbox, automated parser, quarantine for malformed)",
+      "passed": true,
+      "evidence": "Section 4.2.3: dedicated mailbox vendor-k-inventory@inventory.ourdomain.com via SES inbound, SNS->SQS->Celery, acceptance rules (from-domain allowlist, subject regex, attachment types), quarantine bucket for failures with ops Slack ping, manual override path; ClamAV scanning."
+    },
+    {
+      "text": "Designs the shadow-mode rollout phase (compare to current source of truth, dispute resolution)",
+      "passed": true,
+      "evidence": "Phase 3 details 2-week shadow mode: 'Daily comparison report: today, new system would have changed X SKUs; Google Sheet recorded Y changes; here are the deltas. Ops reviews.' Plus apply_enabled config flag and Open Q2 for arbitration."
+    },
+    {
+      "text": "Designs the audit log of inventory changes with source and timestamp",
+      "passed": true,
+      "evidence": "inventory_audit table: 'Append-only audit of every change actually pushed to catalog' with run_id, vendor_id, sku, old_on_hand, new_on_hand, applied_at, source_observed_at. 2-year retention; DB user has INSERT, SELECT only."
+    }
+  ],
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "total": 24,
+    "pass_rate": 1.0
+  }
+}

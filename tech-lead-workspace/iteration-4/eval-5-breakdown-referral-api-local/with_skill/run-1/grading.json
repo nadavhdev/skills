@@ -1,0 +1,105 @@
+{
+  "expectations": [
+    {
+      "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.",
+      "passed": true,
+      "evidence": "Directory tasks-referrals-api/ exists inside outputs/."
+    },
+    {
+      "text": "The tasks directory contains a README.md index file.",
+      "passed": true,
+      "evidence": "README.md is present in tasks-referrals-api/ alongside the five task files."
+    },
+    {
+      "text": "Total files inside tasks-*/ is between 5 and 13 (≤ 12 tasks + 1 README).",
+      "passed": true,
+      "evidence": "Six files total: 5 task files (01-05) plus README.md."
+    },
+    {
+      "text": "Task count is at least 4 (excluding README).",
+      "passed": true,
+      "evidence": "Five numbered task files: 01-walking-skeleton-issuance, 02-idempotent-redemption, 03-support-lookup-endpoint, 04-observability-and-runbook, 05-staged-rollout."
+    },
+    {
+      "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).",
+      "passed": true,
+      "evidence": "All files are 01-..., 02-..., 03-..., 04-..., 05-... with sequential numbering matching the dependency order in README."
+    },
+    {
+      "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria — no extra fields.",
+      "passed": true,
+      "evidence": "Each of the five task files has a heading title plus exactly the six fields (One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria); no extra fields like Effort or Owner."
+    },
+    {
+      "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+      "passed": true,
+      "evidence": "Task bodies contain prose with backtick identifiers like `POST /codes`, table names, and metric names — no fenced code blocks, function signatures, or shell commands."
+    },
+    {
+      "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).",
+      "passed": true,
+      "evidence": "Tasks reference logical entities (referrals-api service, referral_codes/referral_redemptions tables, credit-ledger-api) but no source file paths with .py/.go/.js extensions."
+    },
+    {
+      "text": "NFRs ride with feature tasks in their acceptance criteria. A standalone cross-cutting task is allowed ONLY when ALL its bullets cover service-wide concerns no single feature owns (e.g. service-wide saturation alarm, runbooks spanning multiple §7 failure modes, alert-config deploys that fan out across endpoints). If any bullet of a cross-cutting task could ride with a specific feature task, the task fails this assertion — that is a punt, not legitimate cross-cutting.",
+      "passed": true,
+      "evidence": "NFRs ride with features (task 01 has p99 issuance latency; task 02 has 3x peak load test, idempotency latency, log fields, saturation telemetry; task 03 has p99 lookup latency). Task 04's bullets are each service-wide: log-convention enforcement spans all three endpoints (CI log-lint), alert deploy bundles three service-wide alarms (saturation > 70%, redemption error rate, ledger p99) that fan out across endpoints, runbook covers three §7 failure modes as a single on-call document, and the metric-name registration is a service-wide naming concern. None of these ride cleanly with a single endpoint."
+    },
+    {
+      "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.",
+      "passed": true,
+      "evidence": "No standalone testing task exists; testing references live inside acceptance criteria (e.g. task 02 load test, task 01 collision-retry test)."
+    },
+    {
+      "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.",
+      "passed": true,
+      "evidence": "Task 01 explicitly bundles scaffolding with the working POST /codes issuance path behind the launch flag — it ships user-visible behavior, not pure skeleton."
+    },
+    {
+      "text": "The README or chat summary surfaces the TDD's open questions (fraud policy §10.1 and/or expiry boundary §10.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.",
+      "passed": true,
+      "evidence": "README has a dedicated section 'TDD sections that could not be turned into tasks (open questions block them)' covering §10.1 and §10.2; transcript labels them 'Blocked by open questions'. No abuse-check task exists."
+    },
+    {
+      "text": "The first task in dependency order is a vertical slice / walking skeleton — an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.",
+      "passed": true,
+      "evidence": "Task 01 is 'Walking skeleton: issuance endpoint behind launch flag' — it delivers an end-to-end authenticated POST /codes issuance path that issues a real code, not pure schema/scaffolding."
+    },
+    {
+      "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption — the load-bearing risk identified in the TDD (§4.4, §7).",
+      "passed": true,
+      "evidence": "Task 02 (position 2) is 'Idempotent redemption with credit-ledger integration' and explicitly covers concurrent redemption resolved by the (code) unique constraint mapped to 409, mobile double-tap retries returning the original result via (idempotency_key, code) uniqueness."
+    },
+    {
+      "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.",
+      "passed": true,
+      "evidence": "Task 02 acceptance criteria include: ledger failure rolls back the transaction and no row persists; retrying with the same Idempotency-Key returns the original result and does not produce additional ledger calls; ledger outage produces a loud failure with safe retries on recovery."
+    },
+    {
+      "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).",
+      "passed": true,
+      "evidence": "Task 01 'Depends on: none'; tasks 02 and 03 depend on task 01 by name; task 04 depends on 02 and 03; task 05 depends on 02, 03, and 04 — concrete named references."
+    },
+    {
+      "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).",
+      "passed": true,
+      "evidence": "After task 01 ships, tasks 02 and 03 both depend only on 01 and are independently startable (README and transcript both highlight this fan-out)."
+    },
+    {
+      "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').",
+      "passed": true,
+      "evidence": "Transcript opens with 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`. Covers a new referrals-api synchronous service with three endpoints...'."
+    },
+    {
+      "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.",
+      "passed": true,
+      "evidence": "Transcript states 'Wrote the breakdown to `./tasks-referrals-api/` (5 task files plus a README index)' and has a 'Blocked by open questions' section covering both §10.1 and §10.2."
+    }
+  ],
+  "summary": {
+    "passed": 19,
+    "failed": 0,
+    "total": 19,
+    "pass_rate": 1.0
+  }
+}

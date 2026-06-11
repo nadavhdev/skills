@@ -1,0 +1,55 @@
+{
+  "reviews": [
+    {
+      "run_id": "eval-5-with_skill",
+      "feedback": "Strong overall (18/19). Walking-skeleton task 01 correctly delivers issuance + redemption end-to-end including the §4.4 idempotency dance — exactly what the mindset section calls for. Tasks 02 (credit-ledger hardening) and 03 (support read endpoint) are clean parallel work with honest dependencies. Task 05 (rollout) is appropriately placed at the end with shadow-mode and flag-flip acceptance criteria.\n\nOne concern: task 04 (observability) is borderline-legitimate as cross-cutting. The §9 alerts ARE service-wide (redemption error rate across endpoints, ledger latency from the service, saturation alarm), and the runbooks span multiple §7 failure modes — so it's not a punt. But it's the easier case; the model used the 'cross-cutting allowed when justified' escape valve, and we need to verify the next eval doesn't see the model use the same escape valve for non-legitimate cases.\n\nAction: keep task 04 as-is conceptually, but tighten the skill's cross-cutting test in iteration 2.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-5-without_skill",
+      "feedback": "Exactly the failure mode the skill exists to prevent. 12 horizontal-layer tasks (T01-T12): T01 scaffold, T02 schema migration, T03 code-generator, T04 post-codes endpoint, T05 ledger-client, T06 post-redeem endpoint, T07 get-code endpoint, T08 auth, T09 observability, T10 load-test, T11 runbooks, T12 launch-flag rollout. Classic layering: schema before any feature, auth as its own concern, load-test and runbooks as standalone NFR-as-task work. Implementation details leak throughout. The baseline cannot decompose without the skill — confirmed.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-6-with_skill",
+      "feedback": "Textbook gate behavior (8/8). Acknowledged the TDD in one line, detected no Jira MCP, offered exactly the three branches (interactive MCP install / paste-ready / local FS), and stopped with 'Which would you like?' — no fabricated tickets, no silent default, no proceeding past the gate. This is exactly how a principal tech lead should handle 'I don't have the tool you're asking for'. Ship-ready behavior.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-6-without_skill",
+      "feedback": "Halfway-failure. Honestly admitted no Jira access (passed honesty assertions) but then silently produced 1 Epic + 12 paste-ready stories WITHOUT asking the user what they wanted. Skipped the TDD acknowledgement entirely. Offered three options at the END but they were the wrong three (MCP install / share API token / CSV import) — missing the local-FS branch and missing the interactive walkthrough framing. The baseline knows it's missing a tool but doesn't know to stop and ask.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-7-with_skill",
+      "feedback": "Strong overall (18/19), but the one miss is more substantive than Eval 5's. Walking-skeleton task 01 is solid — minimal end-to-end SELECT * WHERE LIMIT from STDIN to CSV. Tasks 02-06 are clean vertical fan-out (JSON output, schema handling, GROUP BY with memory budget, ORDER BY with memory budget, explain + panic handler). Memory-budget NFR is correctly attached to the blocking-operator tasks — proving the model CAN ride NFRs with features.\n\nProblem: task 07 (CI benchmarks for cold-start latency + 1GB/60s throughput) is a punt, not cross-cutting. Each NFR has a clear feature owner — cold-start is owned by the walking skeleton, throughput is owned by the operator pipeline. The model already attached memory-budget to features 4 and 5 correctly, so it KNOWS the pattern. Splitting cold-start and throughput out specifically is inconsistent with how it handled memory-budget. The 'can't benchmark until features exist' justification is weak.\n\nAction: the skill's cross-cutting escape valve is currently too permissive. Tighten in iteration 2 with a 'can each bullet ride with a specific feature task?' qualifying test. Also surface in iteration 2 whether task 06 (explain + panic handler) should have been merged into task 01 — those are both diagnostics-of-the-CLI features.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-7-without_skill",
+      "feedback": "Horizontal layering at its purest. 12 tasks: 01-scaffold, 02-parser, 03-jsonl-input, 04-operator-pipeline, 05-streaming-ops, 06-aggregate, 07-sort, 08-output-writers, 09-cli-shell, 10-explain-diagnostics, 11-nfr-benchmarks, 12-distribution. Every layer of the architecture is its own task. Implementation code (`go test ./...`) and specific file paths (`cmd/logsql/main.go`) leak into task bodies. Task 01 is pure scaffolding ('prints a stub version'). The baseline produces the exact wrong shape — vindication for the skill's mindset section.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-8-with_skill",
+      "feedback": "Clean 8/8 refusal. Explicit, not softened, explains why (would mean producing opinions about a feature rather than decomposition of agreed design), offers paste/path/URL fallbacks, AND explicitly routes to the TDD-authoring capability of the same skill as a path forward. No draft tasks inline, no batch-asking triage questions and proceeding. This is the right interaction shape for a hard gate. Ship-ready behavior.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-8-without_skill",
+      "feedback": "0/8 — the most dramatic baseline failure of the set. Given a one-line feature blurb ('we want push notifications when orders ship'), the baseline produced 10 fully-fleshed task files in tasks-notifications-service/, complete with TASK-01 service skeleton, TASK-02 data model, TASK-09 observability, TASK-10 rollout, and a 4-sprint plan with sequencing diagram. Zero gate, zero hesitation. This is exactly the failure mode the skill exists to fix, and the contrast is total.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-9-with_skill",
+      "feedback": "Clean 7/7. The transcript explicitly articulates the PRD-vs-TDD distinction ('PRD states the problem, TDD states the design — a breakdown decomposes a design, not a problem'), enumerates which design decisions a TDD would need to nail down before the breakdown is meaningful (code generation strategy, attribution model, storage ownership, idempotency, fraud, expiry, service shape, data pipeline), and offers exactly two clean paths forward: (1) author the TDD first via the same skill, (2) supply an existing TDD. Routes correctly without freelancing. Ship-ready behavior.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    },
+    {
+      "run_id": "eval-9-without_skill",
+      "feedback": "0/7 — same pattern as Eval 8 but worse. Given a PRD and asked for tickets, the baseline produced a full hierarchy: 1 initiative, 7 epics (E1-E7), 25 stories with acceptance criteria and point estimates, plus a 'recommended first sprint' starter set. Mentioned 'this PRD didn't go through a TDD' as a brief caveat AND THEN PROCEEDED to decompose anyway. This is the most insidious failure mode because the model performatively gestures at the right concern and then ignores it. The skill's hard refusal is the only thing that prevents this.",
+      "timestamp": "2026-06-10T08:00:00Z"
+    }
+  ],
+  "status": "complete"
+}

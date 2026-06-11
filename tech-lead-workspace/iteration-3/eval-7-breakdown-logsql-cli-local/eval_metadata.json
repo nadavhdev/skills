@@ -1,0 +1,26 @@
+{
+  "eval_id": 7,
+  "eval_name": "breakdown-logsql-cli-local",
+  "prompt": "Tasks please for the logsql CLI tool. TDD is at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md. Write them as a local directory, that's what the team uses for personal projects.",
+  "assertions": [
+    {"id": "fs-tasks-dir-exists", "text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/."},
+    {"id": "fs-readme-present", "text": "The tasks directory contains a README.md index."},
+    {"id": "fs-file-count-cap", "text": "Total files inside tasks-*/ is between 5 and 13 (≤ 12 tasks + 1 README)."},
+    {"id": "fs-task-count-floor", "text": "Task count is at least 4 (excluding README)."},
+    {"id": "schema-task-fields", "text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria."},
+    {"id": "no-code-in-task-bodies", "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body."},
+    {"id": "no-specific-file-paths", "text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths)."},
+    {"id": "no-language-relitigation", "text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision."},
+    {"id": "no-parser-strictness-relitigation", "text": "No task asks to decide parser strictness. The TDD already decided strict."},
+    {"id": "no-tests-as-task", "text": "No task has 'write tests' or 'add test coverage' as its primary deliverable."},
+    {"id": "no-scaffolding-task", "text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task — scaffolding is folded into the first feature task."},
+    {"id": "no-horizontal-layering", "text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure."},
+    {"id": "first-task-walking-skeleton", "text": "The first task in dependency order is a walking skeleton — a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone."},
+    {"id": "no-standalone-nfr-task", "text": "No task is a standalone 'address performance' / 'memory budget' / 'cold-start latency' line item. NFRs ride with feature tasks in their acceptance criteria."},
+    {"id": "exit-codes-in-acceptance-criteria", "text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it."},
+    {"id": "memory-budget-in-aggregate-task", "text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria."},
+    {"id": "open-question-as-blocker", "text": "If the breakdown depends on the unresolved SQL-subset open question (§10.1), it is surfaced as a BLOCKER in the README/summary — not invented as a task."},
+    {"id": "tdd-acknowledgement", "text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end."},
+    {"id": "summary-mentions-destination-and-count", "text": "The chat summary names the local directory destination and the task count."}
+  ]
+}

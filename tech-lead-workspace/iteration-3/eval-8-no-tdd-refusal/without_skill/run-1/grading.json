@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory or task files were created in outputs/. The only file present is transcript.md.",
+      "passed": false,
+      "evidence": "Baseline created ./tasks-notifications-service/ with README.md and 10 TASK-*.md files alongside transcript.md."
+    },
+    {
+      "text": "The transcript explicitly REFUSES to break down without a TDD. The refusal language is clear and not softened.",
+      "passed": false,
+      "evidence": "No refusal \u2014 transcript opens 'Done \u2014 I broke the notifications service into 10 ticket-sized tasks and wrote them to ./tasks-notifications-service/'."
+    },
+    {
+      "text": "The transcript briefly explains WHY (e.g. 'tasks would be opinions about a feature rather than decomposition of an agreed design').",
+      "passed": false,
+      "evidence": "No explanation of why a TDD is required; instead it explains how it sliced the work (foundation/channels/use-cases/production-ready)."
+    },
+    {
+      "text": "The transcript offers concrete fallback options: paste the TDD, give a file path / URL the assistant can fetch.",
+      "passed": false,
+      "evidence": "No fallback offers; baseline proceeded directly to delivering tasks."
+    },
+    {
+      "text": "The transcript mentions that if the user has only a PRD, the TDD-authoring capability of the SAME skill can author the TDD first as a path forward.",
+      "passed": false,
+      "evidence": "No mention of TDD authoring or a PRD-to-TDD path; baseline has no awareness of the skill's two-capability model."
+    },
+    {
+      "text": "The transcript does NOT contain a 'starting set' / 'rough draft' of tasks. It does NOT batch-ask triage questions and proceed.",
+      "passed": false,
+      "evidence": "Transcript ships a full 10-task sprint plan (TASK-01 through TASK-10) with a sequencing diagram and open questions \u2014 the canonical failure mode."
+    },
+    {
+      "text": "The transcript does NOT offer to 'fill in reasonable defaults' or 'start from what was shared'.",
+      "passed": false,
+      "evidence": "Baseline effectively does this \u2014 it ran with the one-line blurb and filled in foundation/channels/preferences/observability/rollout tickets, then lists 5 'Open questions' to be answered later."
+    },
+    {
+      "text": "No ./tasks-* directory was silently created despite the user saying 'write them locally somewhere reasonable'. The refusal takes precedence over destination guidance.",
+      "passed": false,
+      "evidence": "./tasks-notifications-service/ was created with 11 markdown files (README + 10 tasks)."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 8,
+    "total": 8,
+    "pass_rate": 0.0
+  }
+}

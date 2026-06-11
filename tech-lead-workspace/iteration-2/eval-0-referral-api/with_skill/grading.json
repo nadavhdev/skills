@@ -1,0 +1,125 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "outputs/ contains exactly one file: TDD-referral-code-api.md"
+    },
+    {
+      "text": "Before drafting, the assistant explicitly acknowledges having read the PRD at the given path (with a one-line summary of what it contains)",
+      "passed": true,
+      "evidence": "TDD references the PRD by exact path with author/date: 'Related PRD: /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md (Sarah Chen, Growth PM, 2026-06-04)'. Content shows the writer ingested specific PRD details: 2.1M MAU +8% MoM, $5 credit, Aug 25 back-to-school campaign, July 1 mobile contract freeze, 6 alphanumeric chars excluding 0/O/I/1, Stripe + Postgres credit ledger, AWS us-east-1, Python (FastAPI) or Go, plus PRD's open questions on code expiry and fraud."
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "wc -w reports 6137 words, well over 1500"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '## 1. Problem & context' describes consumer mobile app context, consumers of the API, and why now"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '## 2. Scope' with explicit '**In scope**' and '**Out of scope**' subsections, each with multiple bullet items"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '## 3. High-level approach' includes prose architecture and a boxes-and-arrows ASCII diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '## 4. Detailed design' spans subsections 4a-4k covering API surface, AuthN/Z, data access, latency budget, concurrency, code generation, fraud primitives, activation pipeline, deep-link attribution, dependencies, error contract"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '## 5. Alternatives considered' lists 5 alternatives A-E (extending user-profile service, Go service, event-driven activation via SQS/Kafka, deterministic hash codes, do nothing) each with Pros/Cons and **Rejected** rationale"
+    },
+    {
+      "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section '## 6. Non-functional requirements' includes concrete numbers: '99.9% monthly availability (~43 min downtime / month)', 'p95 <= 250ms mobile-facing, p95 <= 400ms activation', '30 RPS p95 sustained at peak burst', 'RTO: 1 hour, RPO: 5 minutes', '$1500/month service cost', '24 months retention'"
+    },
+    {
+      "text": "NFRs section visibly accounts for every NFR in the checklist — either a target or explicit 'N/A — reason' (no silent omissions)",
+      "passed": true,
+      "evidence": "NFR section walks Scalability, Reliability & availability, Resilience, Performance, Observability, Security, Cost, Compliance & privacy (with explicit 'PCI scope: no', 'HIPAA: N/A', data residency 'N/A today'), Deployment & operations, Disaster recovery (multi-region 'None at launch' with justification), Maintainability, Extensibility — all with targets or explicit N/A reasons"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '## 7. Risks & failure modes' has an 8-row table with #, Risk, Likelihood, Blast radius, Mitigation, Recovery columns"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section '## 8. Rollout & migration' with Phasing (Week -4 through launch day), Backwards compatibility, and Rollback story subsections"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section '## 9. Observability & operations' enumerating pager triggers, ticket triggers, and required runbook items, plus the detailed Observability subsection in NFRs covering metrics, logs, traces, alerts"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '## 10. Open questions' has 10 numbered open questions (activation signal source, janitor location, fraud appetite, s2s auth mechanism, code expiry, device-id availability, activation latency UX, Looker schema, monorepo decision, load-test fidelity)"
+    },
+    {
+      "text": "Contains no fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "Only URL is the example share URL 'https://app.example.com/r/K7M2QH' (clearly example.com placeholder) and an explicit '<link to runbook — to be added>' acknowledgment. No fake internal Confluence/Jira/Datadog/etc URLs"
+    },
+    {
+      "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)",
+      "passed": true,
+      "evidence": "Section 4a has a Routes table with HTTP methods (GET/POST), paths (/v1/referral/me, /v1/referral/redeem, /v1/referral/attribute, /v1/internal/activation), success/error codes, plus JSON response schema sketches; Section 4b explicitly titled 'AuthN / AuthZ' covering JWT, mTLS, and audit logging"
+    },
+    {
+      "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes",
+      "passed": true,
+      "evidence": "Section 4c gives SQL CREATE TABLE for referral.codes (PRIMARY KEY user_id, UNIQUE code), referral.redemptions (PRIMARY KEY id, UNIQUE invitee_user_id, CHECK self-referral), referral.activations (PRIMARY KEY redemption_id), plus explicit CREATE INDEX statements for redemptions_inviter_idx and redemptions_state_created_idx"
+    },
+    {
+      "text": "Explicitly addresses idempotency of the redemption call",
+      "passed": true,
+      "evidence": "Section 4a 'Idempotency strategy on writes' subsection: 'POST /v1/referral/redeem: natural idempotency on (invitee_user_id) — enforced by a unique constraint. Second call returns the same redemption_id with HTTP 200, not 409'. Also Section 6 Reliability: 'All write endpoints have a natural idempotency key'"
+    },
+    {
+      "text": "Addresses fraud / self-referral / multi-account abuse prevention",
+      "passed": true,
+      "evidence": "Section 4g 'Fraud / anti-abuse primitives (launch level)' lists 6 measures: DB-level self-referral CHECK, UNIQUE invitee_user_id, activation gate = first paid subscription, per-IP WAF velocity, daily anomaly job for fake-account farming, 7-day soft hold of inviter credit for reversal. Section 7 Risk #2 and #8 also cover fraud/multi-account"
+    },
+    {
+      "text": "Defines or constrains what 'activation' means and the credit-issuance trigger flow",
+      "passed": true,
+      "evidence": "Section 1 defines 'activated' as 'reaches their first paid subscription'. Section 4h 'Activation pipeline & transactional consistency' walks the full credit-issuance flow: billing POST -> SELECT FOR UPDATE -> state transition to activated -> insert activations -> post-commit credit-ledger calls with pre-generated txn IDs -> janitor reconciliation"
+    },
+    {
+      "text": "Addresses code-collision / generation strategy",
+      "passed": true,
+      "evidence": "Section 4f 'Code generation and shape' details alphabet 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' (32 chars excluding 0/O/I/1), 6 chars = ~1.07B codespace, CSPRNG via secrets.token_bytes, INSERT ... ON CONFLICT DO NOTHING RETURNING for collision retry, and unique constraint as source of truth"
+    },
+    {
+      "text": "Has a concrete latency budget for the API (numbers, not 'fast')",
+      "passed": true,
+      "evidence": "Section 4d 'Latency budget' with a per-stage breakdown table: TLS+gateway 20ms, JWT validation 5ms, Postgres queries 15ms, app logic 10ms, network 50ms, safety margin 150ms, totaling p95 <= 250ms mobile-facing and p95 <= 400ms for activation"
+    },
+    {
+      "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails",
+      "passed": true,
+      "evidence": "Mentions Stripe as ultimate billing integration with credit-ledger-svc as intermediary in Section 3 diagram. Section 4h covers credit write failure: 'Ledger 5xx -> retry with backoff, exponential, capped at 1 hour. After 24h still failing, page on-call. Ledger 4xx -> fail the activation, alert. Our process dies mid-flow -> janitor.' Section 4j has dependency table row for Credit ledger svc: 'Activation path queues internally; janitor retries'"
+    }
+  ],
+  "summary": {
+    "passed": 23,
+    "failed": 0,
+    "total": 23,
+    "pass_rate": 1.0
+  }
+}

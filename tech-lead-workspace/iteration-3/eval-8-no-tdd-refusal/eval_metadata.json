@@ -1,0 +1,15 @@
+{
+  "eval_id": 8,
+  "eval_name": "no-tdd-refusal",
+  "prompt": "hey can you break down the notifications service feature into tasks for the team? we want users to get push notifications when their order ships, and emails for promo campaigns. let's split it into tickets so we can start sprinting. write them locally somewhere reasonable.",
+  "assertions": [
+    {"id": "no-task-files-written", "text": "No task directory or task files were created in outputs/. The only file present is transcript.md."},
+    {"id": "explicit-refusal", "text": "The transcript explicitly REFUSES to break down without a TDD. The refusal language is clear and not softened."},
+    {"id": "explains-why", "text": "The transcript briefly explains WHY (e.g. 'tasks would be opinions about a feature rather than decomposition of an agreed design')."},
+    {"id": "offers-fallbacks", "text": "The transcript offers concrete fallback options: paste the TDD, give a file path / URL the assistant can fetch."},
+    {"id": "mentions-tdd-authoring-path", "text": "The transcript mentions that if the user has only a PRD, the TDD-authoring capability of the SAME skill can author the TDD first as a path forward."},
+    {"id": "no-draft-tasks-inline", "text": "The transcript does NOT contain a 'starting set' / 'rough draft' of tasks. It does NOT batch-ask triage questions and proceed."},
+    {"id": "no-defaults-filled-in", "text": "The transcript does NOT offer to 'fill in reasonable defaults' or 'start from what was shared'."},
+    {"id": "no-silent-local-write", "text": "No ./tasks-* directory was silently created despite the user saying 'write them locally somewhere reasonable'. The refusal takes precedence over destination guidance."}
+  ]
+}

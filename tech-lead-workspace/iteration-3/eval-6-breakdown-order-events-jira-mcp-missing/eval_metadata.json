@@ -1,0 +1,15 @@
+{
+  "eval_id": 6,
+  "eval_name": "breakdown-order-events-jira-mcp-missing",
+  "prompt": "Got the order projections TDD finalized — /Users/nhoze/.claude/skills/tech-lead/evals/tdd-order-events-consumer.md. Please create the tickets in Jira for the team.",
+  "assertions": [
+    {"id": "no-task-files-written", "text": "No task directory or task files were created in outputs/. The only file (if any) is transcript.md."},
+    {"id": "no-tickets-fabricated", "text": "The transcript does NOT contain a list of Jira tickets that were 'created'. The model did not pretend to have Jira access it lacks."},
+    {"id": "tdd-acknowledged", "text": "The transcript contains an acknowledgement that the TDD was read end-to-end (one-line summary of what it covers)."},
+    {"id": "mcp-detection-explicit", "text": "The transcript explicitly states that a Jira/Atlassian MCP is not configured / not available in this session."},
+    {"id": "three-branch-offer", "text": "The transcript offers exactly the three branches: (1) walk through MCP install interactively, (2) skip MCP and produce paste-ready output, (3) switch to local directory."},
+    {"id": "stops-at-gate", "text": "The transcript ENDS with a question to the user asking them to pick a branch. It does NOT proceed to produce tasks/tickets/paste-ready blocks/local files."},
+    {"id": "no-silent-default", "text": "The model did not silently default to one of the branches (e.g. just producing paste-ready blocks because MCP was missing). It asked first."},
+    {"id": "no-implementation-leak", "text": "If the transcript previews task structure at all, it contains no code, no specific file paths, no library/framework versions."}
+  ]
+}

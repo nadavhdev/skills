@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory or task files were created in outputs/. The only file (if any) is transcript.md.",
+      "passed": true,
+      "evidence": "ls of without_skill/outputs/ shows only transcript.md; no tasks directory was written to the filesystem (the breakdown was inlined into the transcript instead)."
+    },
+    {
+      "text": "The transcript does NOT contain a list of Jira tickets that were 'created'. The model did not pretend to have Jira access it lacks.",
+      "passed": true,
+      "evidence": "The model states up front 'I can't actually create issues in your Jira instance from here' and presents the items as a 'ready-to-paste ticket breakdown', not as created tickets."
+    },
+    {
+      "text": "The transcript contains an acknowledgement that the TDD was read end-to-end (one-line summary of what it covers).",
+      "passed": false,
+      "evidence": "No leading one-line summary of the TDD; the transcript jumps into the Jira-access caveat and then directly into the epic/stories without summarizing the TDD's contents end-to-end."
+    },
+    {
+      "text": "The transcript explicitly states that a Jira/Atlassian MCP is not configured / not available in this session.",
+      "passed": true,
+      "evidence": "Lines 3-4: 'I don't have a Jira MCP / Jira API connection wired up in this session, so I can't actually create issues in your Jira instance from here.'"
+    },
+    {
+      "text": "The transcript offers exactly the three branches: (1) walk through MCP install interactively, (2) skip MCP and produce paste-ready output, (3) switch to local directory.",
+      "passed": false,
+      "evidence": "The three options offered at the end are 'Stand up a Jira MCP server', 'Give me a Jira API token + base URL + project key', and 'CSV import'. No interactive MCP walkthrough, no local-directory branch, and the paste-ready output was already produced rather than offered as a choice."
+    },
+    {
+      "text": "The transcript ENDS with a question to the user asking them to pick a branch. It does NOT proceed to produce tasks/tickets/paste-ready blocks/local files.",
+      "passed": false,
+      "evidence": "The transcript produces a full Epic + 12 stories with scope, acceptance criteria, dependencies, and sizes BEFORE asking; the gate is violated even though the closing line asks the user to pick a delivery path."
+    },
+    {
+      "text": "The model did not silently default to one of the branches (e.g. just producing paste-ready blocks because MCP was missing). It asked first.",
+      "passed": false,
+      "evidence": "The model defaults to producing paste-ready ticket blocks ('a ready-to-paste ticket breakdown derived from the TDD') without first asking the user which branch to take."
+    },
+    {
+      "text": "If the transcript previews task structure at all, it contains no code, no specific file paths, no library/framework versions.",
+      "passed": true,
+      "evidence": "The 12 stories are outcome-oriented with acceptance criteria; no code blocks, no library versions, no specific source file paths beyond TDD section refs (e.g. 'TDD ref: \u00a74.2')."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 4,
+    "total": 8,
+    "pass_rate": 0.5
+  }
+}

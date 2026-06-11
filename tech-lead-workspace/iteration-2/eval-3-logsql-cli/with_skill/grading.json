@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "outputs/ contains exactly one file: TDD-logsql-cli.md"
+    },
+    {
+      "text": "Before drafting, the assistant explicitly acknowledges having read the PRD with a one-line summary",
+      "passed": true,
+      "evidence": "Section 1 reflects specific PRD details (INC-4421, '40 minutes', '12 files', DX survey #2 ranking, ~`brew install logsql`~, 5 GB / 16 GB target) demonstrating the writer read the actual PRD. Related PRD path cited at top: '/Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md'."
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "wc -w reports 4575 words"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '## 1. Problem & context'"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '## 2. Scope' has explicit '**In scope (v1):**' and '**Out of scope:**' subsections"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '## 3. High-level approach' with box-and-arrow diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '## 4. Detailed design' with 9 subsections (4a-4i): command surface, exit codes, STDIN, parser+executor, memory/streaming, schema, concurrency, dependencies, error reporting"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale",
+      "passed": true,
+      "evidence": "Section 5 has 6 alternatives (5a Go vs Python, 5b DuckDB, 5c jq+scripts, 5d SQLite in-memory, 5e ANSI vs lenient parser, 5f config.toml vs schema-on-read), each with explicit rejection rationale"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets",
+      "passed": true,
+      "evidence": "Section '## 6. Non-functional requirements' with concrete targets like '1 GB compressed in <= 5 s on a 2024 MBP M3', 'spill at --max-mem (default 512 MiB)', '10% regression threshold'"
+    },
+    {
+      "text": "NFRs section visibly accounts for every NFR — either a target or explicit 'N/A — reason' (CLI should have many N/As here, written out)",
+      "passed": true,
+      "evidence": "Section 6 walks each NFR with explicit N/A entries: 'Availability SLO. N/A — local CLI, no uptime', 'SPOFs. None', 'Bulkheads. N/A', 'Timeouts. N/A', 'Backoff & jitter. N/A', 'Metrics. N/A', 'Traces. N/A', 'AuthN/AuthZ. N/A', 'Data residency. N/A', 'Retention. N/A', 'RTO/RPO. N/A', 'Backups. N/A', 'Multi-region. N/A', 'Feature flags. N/A', 'Migrations. N/A'"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '## 7. Risks & failure modes' with table of 8 risks (type inference miss, OOM, malformed JSON, spill disk full, SIGINT cleanup, gzip bomb, secrets in stderr, perf regression)"
+    },
+    {
+      "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)",
+      "passed": true,
+      "evidence": "Section '## 8. Rollout & migration' covers phasing (alpha/beta/GA), GoReleaser, Homebrew tap, brew/pip install for rollback; versioning detailed in 6 Extensibility ('Semver. Grammar changes... major. New flags... minor.')"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '## 10. Open questions' has 8 numbered entries"
+    },
+    {
+      "text": "No fabricated/invented URLs",
+      "passed": true,
+      "evidence": "grep for https?:// returned no matches — document contains no URLs"
+    },
+    {
+      "text": "TDD is structured as a CLI utility design",
+      "passed": true,
+      "evidence": "Sections 4a Command surface, 4b Exit codes, 4c STDIN/pipe, 4e Memory & streaming, 8 Rollout (brew/pip distribution), 9 Exit codes & diagnostics — all CLI-shaped"
+    },
+    {
+      "text": "Sketches the command surface with flags / args / --help shape",
+      "passed": true,
+      "evidence": "Section 4a shows full --help-style block: 'logsql [flags] <query> [files...]' with flags -f/--format, -o/--output, --no-header, --null, --max-mem, --spill-dir, --workers, --strict, --schema, --explain, --version, -h/--help"
+    },
+    {
+      "text": "Defines exit codes",
+      "passed": true,
+      "evidence": "Section 4b table: 0 success, 1 generic runtime error, 2 usage/arg/parse error, 3 skipped lines in non-strict, 4 strict-mode abort"
+    },
+    {
+      "text": "Documents STDIN / pipe composition behavior",
+      "passed": true,
+      "evidence": "Section 4c: 'No file arguments and stdin is a pipe → read JSONL from stdin... TTY → exit 2... A path argument of - is treated as stdin... Gzip detection on stdin is by magic bytes (1f 8b)... stderr vs stdout separation'"
+    },
+    {
+      "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations",
+      "passed": true,
+      "evidence": "Section 4e: 'the tool streams record-by-record through filter and projection. Aggregation and sort buffer to --max-mem (default 512 MiB) and spill to --spill-dir when over.' Plus formal bound: 'O(largest_record_size + decoder_buffers)' for non-aggregate, 'O(group_count * row_size) until spill' for aggregation"
+    },
+    {
+      "text": "Specifies output formats and how the user selects between them",
+      "passed": true,
+      "evidence": "Scope: 'JSON (default), JSONL, CSV, TSV, aligned-columns (table). Format auto-selects to table when stdout is a TTY, jsonl otherwise (overridable with --format)'; flag '-f, --format json|jsonl|csv|tsv|table'"
+    },
+    {
+      "text": "Takes an explicit position on Go vs Python with stated tradeoffs",
+      "passed": true,
+      "evidence": "Section 5a 'Language: Go vs Python — taking a stance. Recommendation: Go.' with 3 concrete reasons (single-binary install, streaming throughput / GIL, ecosystem mismatch) and explicit tradeoff: 'the devtools-Python umbrella team won't be able to maintain it as easily. We mitigate by...'"
+    },
+    {
+      "text": "Takes an explicit position on SQL parser strictness with reasoning",
+      "passed": true,
+      "evidence": "Section 4d: 'Parser: a hand-written PEG-style parser for a defined PartiQL-flavoured SQL subset. Not ANSI-strict. Not looks like SQL.' with rationale rejecting both extremes (ANSI bloat 5-15 MB, lenient gives silent semantic divergence) and middle-path justification"
+    },
+    {
+      "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk",
+      "passed": true,
+      "evidence": "Section 5b 'Embed DuckDB instead of writing a parser + executor', 5c 'Use jq + scripts (do nothing)', 5d 'Load whole file, then SQLite in-memory' — covers jq and DuckDB explicitly; awk is referenced in Section 1's status quo discussion but not as a dedicated alternative. DuckDB and jq alternatives are present."
+    },
+    {
+      "text": "Addresses the 5s/1GB-compressed performance target with a real plan",
+      "passed": true,
+      "evidence": "Section 6 Performance: 'Latency target. Time-to-first-result < 5 s for 1 GB compressed input on 2024 MBP M3'; Verification 'bench/ directory with go test -bench against pinned 100 MB / 1 GB / 5 GB synthetic JSONL files, run on every PR with regression threshold (>= 10% slower fails CI)'. Section 5a justifies Go choice by JSON parser throughput (1-2 GB/s with fastjson/sonic). Section 3 architecture (per-file parallel workers, streaming operators) and 4g concurrency model directly support the budget."
+    }
+  ],
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "total": 24,
+    "pass_rate": 1.0
+  }
+}

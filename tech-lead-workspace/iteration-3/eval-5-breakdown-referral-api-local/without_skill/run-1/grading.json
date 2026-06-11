@@ -1,0 +1,105 @@
+{
+  "expectations": [
+    {
+      "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.",
+      "passed": false,
+      "evidence": "Files were written flat into outputs/ (T01\u2013T12 + README.md + transcript.md), not into a tasks-* subdirectory."
+    },
+    {
+      "text": "The tasks directory contains a README.md index file.",
+      "passed": true,
+      "evidence": "README.md exists in outputs/ with an index table, sequencing diagram, and blocked/parked section."
+    },
+    {
+      "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+      "passed": false,
+      "evidence": "No tasks-* directory exists; counting flat files we have 12 task files + README = 13, which would be at the cap, but the directory structure assertion fails so this assertion does not apply correctly. Strictly, there is no tasks-*/ to count, so fails."
+    },
+    {
+      "text": "Task count is at least 4 (excluding README).",
+      "passed": true,
+      "evidence": "12 task files (T01\u2013T12) are present, well above the floor of 4."
+    },
+    {
+      "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).",
+      "passed": false,
+      "evidence": "Task files use 'T01-...md', 'T02-...md' pattern (with a 'T' prefix) rather than the NN-<slug>.md pattern. Ordering within the listing is not strictly dependency order either (e.g. T05 ledger-client appears before T06 redeem which depends on it, which is fine, but T08 auth appears after endpoints that need it)."
+    },
+    {
+      "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.",
+      "passed": false,
+      "evidence": "Task files use a different schema: Title, Estimate, Depends on, TDD ref, Outcome, Scope, Out of scope, Acceptance criteria, Notes. There is no 'One-liner' field, no 'Composes' field, and several extra fields (Estimate, Out of scope, Notes) that are not in the required six."
+    },
+    {
+      "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+      "passed": false,
+      "evidence": "Multiple violations: T07 contains a fenced JSON response-shape block; T05 contains a function signature 'post_credit(user_id, amount_cents, idempotency_key, reason) -> CreditResult'; T03 contains the signature 'generate(check_exists)' and references to CodeCollisionError type; T09 contains pseudocode-style metric label sets. T06 contains a numbered pseudocode list of transaction steps with derived idempotency-key string templates."
+    },
+    {
+      "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).",
+      "passed": true,
+      "evidence": "No source-file paths or .py/.go/.js references appear in any task body. Tasks reference table names, header names, and TDD sections only."
+    },
+    {
+      "text": "No task is a standalone 'address NFRs' / 'add observability' / 'address scalability' line item \u2014 NFRs ride with feature tasks in their acceptance criteria.",
+      "passed": false,
+      "evidence": "T09 is a standalone 'Metrics, structured logs, and alert rules' observability task; T10 is a standalone 'Load test at 3\u00d7 peak' NFR-verification task; T11 is a standalone 'Runbooks' task. Multiple standalone NFR-ish tasks rather than NFRs riding inside feature tasks."
+    },
+    {
+      "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.",
+      "passed": true,
+      "evidence": "No task is titled or scoped primarily as 'write tests'. Testing references appear inside acceptance criteria, and T10 is a load-test rather than a unit-test task."
+    },
+    {
+      "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.",
+      "passed": false,
+      "evidence": "T01 'Bootstrap referrals-api service scaffold' is explicitly a pure scaffolding task \u2014 'A new service exists in the standard service template, deploys to staging, responds to GET /healthz' with no business behavior. T02 'Postgres schema + migration' is also schema-only without shippable user behavior."
+    },
+    {
+      "text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.",
+      "passed": true,
+      "evidence": "README has a 'Blocked / parked' section explicitly calling out \u00a710.1 (blocked on product, no task created) and \u00a710.2 (carried as assumption in T06). transcript reiterates these. No 'decide fraud policy' task exists."
+    },
+    {
+      "text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.",
+      "passed": false,
+      "evidence": "T01 is literally 'Bootstrap service scaffold' with healthz/readyz only, T02 is schema migration only, T03 is a pure code-generator unit. The first end-to-end deliverable is T04 (POST /codes) and full redeem behavior is T06 \u2014 not the first task in dependency order."
+    },
+    {
+      "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).",
+      "passed": false,
+      "evidence": "Idempotency under concurrent redemption is addressed in T06, which is position 6 in the dependency ordering, not top-3. The top-3 tasks (T01 scaffold, T02 schema, T03 code generator) do not address the redemption-idempotency risk."
+    },
+    {
+      "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.",
+      "passed": true,
+      "evidence": "T05 has dedicated acceptance criteria covering ledger 5xx \u2192 LedgerUnavailableError, timeout \u2192 LedgerTimeoutError, idempotency-key forwarding verbatim, and explicit 'no internal retry' verification. T06 adds ledger-5xx \u2192 502 with retry-clean behavior."
+    },
+    {
+      "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).",
+      "passed": true,
+      "evidence": "All tasks except T01 have concrete 'Depends on' lines referencing other task IDs (e.g. T06 depends on T02, T05; T09 depends on T04, T06, T07; T12 depends on T04, T06, T07, T09)."
+    },
+    {
+      "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).",
+      "passed": true,
+      "evidence": "After T01, three tasks (T02 schema, T03 code generator, T05 ledger client, T08 auth) all depend only on T01 and are independently startable per the README sequencing diagram and the suggested 3-engineer pickup."
+    },
+    {
+      "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').",
+      "passed": false,
+      "evidence": "transcript.md opens with 'Broke the referrals TDD down into 12 task files' but does not contain an explicit 'Read the TDD at ...' acknowledgement line confirming end-to-end reading."
+    },
+    {
+      "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.",
+      "passed": true,
+      "evidence": "transcript.md names the destination ('written to this directory along with a README.md index'), the task count (12), and surfaces both open-question items (\u00a710.1 fraud/abuse policy and \u00a710.2 expiry-at-boundary) as parked/not-tickets."
+    }
+  ],
+  "summary": {
+    "passed": 9,
+    "failed": 10,
+    "total": 19,
+    "pass_rate": 0.4737
+  }
+}

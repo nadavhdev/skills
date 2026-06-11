@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory or task files were created in outputs/. The only file present is transcript.md.",
+      "passed": true,
+      "evidence": "outputs/ contains only transcript.md; no tasks-* directory or task files were created."
+    },
+    {
+      "text": "The transcript explicitly REFUSES to break down without a TDD. The refusal language is clear and not softened.",
+      "passed": true,
+      "evidence": "Opens with 'I won't break this down without a TDD' and closes with 'Without that design committed, any tickets I write would be guesses dressed up as a sprint plan.' \u2014 clean, unsoftened."
+    },
+    {
+      "text": "The transcript briefly explains WHY (e.g. 'tasks would be opinions about a feature rather than decomposition of an agreed design').",
+      "passed": true,
+      "evidence": "'without one, the tasks would be my opinions about a feature, not a decomposition of a design the team has agreed on, and the result wouldn't be principal-level.'"
+    },
+    {
+      "text": "The transcript offers concrete fallback options: paste the TDD, give a file path / URL the assistant can fetch.",
+      "passed": true,
+      "evidence": "Numbered list offers: '1. Paste the TDD ... here, or 2. Give me a file path or URL I can fetch (local file, public URL, or a Drive/Confluence link with the relevant MCP configured)'."
+    },
+    {
+      "text": "The transcript mentions that if the user has only a PRD, the TDD-authoring capability of the SAME skill can author the TDD first as a path forward.",
+      "passed": true,
+      "evidence": "'3. If you only have a PRD (or no design doc at all yet), say so and I'll author the TDD first via the TDD-authoring capability \u2014 then we break that down into tickets.'"
+    },
+    {
+      "text": "The transcript does NOT contain a 'starting set' / 'rough draft' of tasks. It does NOT batch-ask triage questions and proceed.",
+      "passed": true,
+      "evidence": "No drafted tasks appear. The transcript lists topics a TDD would need to cover, but frames them as required design content, not as draft tickets."
+    },
+    {
+      "text": "The transcript does NOT offer to 'fill in reasonable defaults' or 'start from what was shared'.",
+      "passed": true,
+      "evidence": "No offer to fill in defaults; explicitly states 'any tickets I write would be guesses dressed up as a sprint plan' if produced without the TDD."
+    },
+    {
+      "text": "No ./tasks-* directory was silently created despite the user saying 'write them locally somewhere reasonable'. The refusal takes precedence over destination guidance.",
+      "passed": true,
+      "evidence": "Filesystem confirms only transcript.md exists in outputs/; no tasks-* directory was created."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

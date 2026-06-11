@@ -1,0 +1,125 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-logsql-cli.md exists in outputs/ directory"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document is substantially longer than 1500 words, with 15 numbered sections, code blocks, tables, and detailed prose across ~680 lines"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section 1 'Problem statement' describes the on-call workflow pain and INC-4421"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section 2 'Scope' includes 'In scope (v0.1)' and 'Out of scope (v0.1)' subsections"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section 4 'High-level architecture' with pipeline diagram (Sources -> Decoder -> Project -> Aggregator -> Encoder)"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section 5 'Detailed design' covers module layout, type system, SQL grammar EBNF, source resolution, JSON decoding strategy, aggregation, sort, encoders, config, error reporting"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section 10 covers Language (Go/Python/Rust/DuckDB/q-jq-dsq), Parser (ANTLR/goyacc/PEG/Pratt), Schema, and Execution model alternatives each with verdicts and rationale"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section 9 NFRs with concrete targets: <5s for 1GB compressed, ~4.2s budget breakdown, mem-limit 1GiB default, fuzz >=1 hour per release, 90% invocations <10s"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section 12 'Risks & failure modes' is a table with 8 risks, likelihoods, impacts, and mitigations"
+    },
+    {
+      "text": "Contains a 'Rollout' section appropriate for a CLI (release / distribution / versioning)",
+      "passed": true,
+      "evidence": "Section 13 'Rollout & migration' has Phase 0-3 with v0.1 alpha, v0.5 beta, v1.0 GA, Homebrew tap, signed/notarized macOS, SLSA-2 Linux releases, rollback via pinned versions"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section 11 'Open questions' lists 8 items including JSON decoder choice, LIKE semantics, HLL precision, timestamp inference, brew tap location"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "No invented internal URLs; only generic references like 'devtools/homebrew-tap' and standard GitHub releases"
+    },
+    {
+      "text": "TDD is structured as a CLI utility design",
+      "passed": true,
+      "evidence": "Section 7 'CLI contract' with full flag list, positional args, exit codes; explicitly designed as a stateless CLI"
+    },
+    {
+      "text": "Sketches the command surface with flags / args / --help shape",
+      "passed": true,
+      "evidence": "Section 7 shows full flag list: -f/--format, -o/--output, --mem-limit, --max-line-size, --on-bad-row, --explain, --explain-analyze, -c/--config, -v/--verbose, --version, -h/--help"
+    },
+    {
+      "text": "Defines exit codes (incl. any tool-specific codes as a deliberate design choice)",
+      "passed": true,
+      "evidence": "Section 8 exit codes table: 0 success, 1 runtime, 2 usage, 3 resource limit, 130 SIGINT; explicitly rejects 'exit 1 if zero rows' as a deliberate choice"
+    },
+    {
+      "text": "Documents STDIN / pipe composition behavior (reads stdin when no files; works in pipelines)",
+      "passed": true,
+      "evidence": "Section 5.4: 'If no positional args: read STDIN. If STDIN is a TTY and no files: error'; Section 9.7 documents line-buffered vs fully-buffered pipe mode; appendix A4 shows gunzip|logsql pipeline"
+    },
+    {
+      "text": "Explicitly states streaming vs whole-load posture, with memory bound for aggregations (GROUP BY / ORDER BY)",
+      "passed": true,
+      "evidence": "Section 4.2 Memory model: 'Streaming scan -> filter -> project is O(1) memory'; 'GROUP BY and ORDER BY are bounded by --mem-limit (default 1 GiB)' with spill to disk"
+    },
+    {
+      "text": "Specifies output formats and how the user selects between them (--json/--csv/--tsv/etc.)",
+      "passed": true,
+      "evidence": "Section 5.8 table of formats (json/csv/tsv/table), selected via -f/--format flag with auto default (table if TTY, ndjson otherwise)"
+    },
+    {
+      "text": "Takes an explicit position on Go vs Python with stated tradeoffs (does not punt to 'either is fine')",
+      "passed": true,
+      "evidence": "Section 3.1 'Language: Go' - explicit decision with rationale around 60-second install promise, pip UX, perf budget; Python rejected explicitly in 10.1 alternatives table"
+    },
+    {
+      "text": "Takes an explicit position on SQL parser strictness with reasoning",
+      "passed": true,
+      "evidence": "Section 3.2 'Parser strictness: Forgiving but typed' - hand-written Pratt parser, forgiving lexing but strict semantics, with explicit rejection of both 'strict ANSI' and 'looks like SQL'"
+    },
+    {
+      "text": "'Alternatives considered' includes existing tools like jq, duckdb, awk, or similar — with honest rejection rationale",
+      "passed": true,
+      "evidence": "Section 10.1 includes DuckDB CLI ('Heavy dep ~50 MB, wrong defaults for ndjson logs') and q/jq/dsq ('q is CSV-first, jq isn't SQL, dsq requires schema and isn't streaming')"
+    },
+    {
+      "text": "Explicitly omits NFRs that do not apply to a CLI (availability SLO, multi-region, disaster recovery) — states the omission rather than fabricating values",
+      "passed": false,
+      "evidence": "Section 9.3 Reliability says 'No daemon, no state' but does not explicitly state DR/availability SLO/multi-region as 'not applicable'. While section 6 notes statelessness, there's no explicit omission statement like 'DR: not applicable; this is a CLI'"
+    },
+    {
+      "text": "Addresses the 5s/1GB-compressed performance target with a real plan",
+      "passed": true,
+      "evidence": "Section 9.1 has a detailed budget breakdown table: gzip 2.0s, line scan 0.4s, JSON tokenize 1.5s, filter+count 0.3s, output 0.01s, total ~4.2s with 15% headroom; plus pprof/benchstat plan and pgzip fallback"
+    }
+  ],
+  "summary": {
+    "passed": 22,
+    "failed": 1,
+    "total": 23,
+    "pass_rate": 0.9565217391304348
+  }
+}

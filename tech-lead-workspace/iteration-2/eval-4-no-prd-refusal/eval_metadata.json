@@ -1,0 +1,15 @@
+{
+  "eval_id": 4,
+  "eval_name": "no-prd-refusal",
+  "prompt": "hey can you write a TDD for the new notifications service we're building? we want users to get push notifications when their order ships, and emails for promo campaigns. should support around 100k users, with potential to grow to 1M. save it as a markdown file in the current dir please, i need it for tomorrow's review.",
+  "assertions": [
+    {"id": "no_tdd_file_produced",     "text": "No TDD-*.md file is created in the outputs/ directory"},
+    {"id": "response_refuses",         "text": "The assistant's final response explicitly states it will not / cannot draft a TDD without a PRD"},
+    {"id": "explains_why",             "text": "The refusal explains the reason — that designing without a PRD would mean inventing the requirements, or equivalent reasoning"},
+    {"id": "offers_fallback_options",  "text": "The refusal offers concrete fallback options (paste the PRD, give a file path, give a URL, or help write the PRD)"},
+    {"id": "no_inline_draft",          "text": "The response does not contain a drafted TDD inline (no section headers like '## Problem', '## Detailed design', '## NFRs', no skeleton filled in)"},
+    {"id": "no_silent_proceed",        "text": "The response does NOT 'fill in reasonable defaults', 'start from what was shared', or batch-ask triage questions and then proceed to draft"},
+    {"id": "no_classification_before_prd", "text": "Does not classify the workload type or pick a category reference before having a PRD in hand"},
+    {"id": "single_clear_message",     "text": "The refusal is a single, clear, direct message — not a several-paragraph essay or hedge"}
+  ]
+}

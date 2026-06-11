@@ -1,0 +1,26 @@
+{
+  "skill_name": "dev-expert",
+  "evals": [
+    {
+      "id": 1,
+      "name": "fresh-implement-no-key-positional-fallback",
+      "prompt": "Implement task 03-no-key-positional-fallback from ./tasks-csvdiff/. Assume task 01 is already done (its done.md is in the tasks dir). Take this end-to-end: code, tests, lint, review loop with the tech-lead skill, commit, and open a PR. Write the handoff doc when you're done.",
+      "expected_output": "A complete dev-expert run: a new branch with code + tests, all lint and pytest green, at least one review round captured in state.json, a commit and PR (or simulated PR), and a task-03.done.md in ./tasks-csvdiff/ following the template. The original task-03 .md file should be moved to ./tasks-csvdiff/done/. state.json should end with current_stage=done.",
+      "files": ["tasks-csvdiff/03-no-key-positional-fallback.md", "tasks-csvdiff/01-walking-skeleton-keyed-csvdiff.done.md (synthetic, prepared for the test)"]
+    },
+    {
+      "id": 2,
+      "name": "refusal-gate-no-task-file",
+      "prompt": "Implement the csvdiff tool for csvkit. It should compare two CSV files by a key column and emit a human-readable diff with the right exit codes.",
+      "expected_output": "The skill should REFUSE to proceed and tell the user it requires a concrete task file on disk in a ./tasks-<slug>/ directory, with the refusal language documented in SKILL.md (or close to it). It should NOT silently start writing code or invent acceptance criteria.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "resume-from-mid-pipeline-state",
+      "prompt": "Continue task 01-walking-skeleton-keyed-csvdiff from ./tasks-csvdiff/. There's a state.json showing you're mid-pipeline.",
+      "expected_output": "The skill should read the existing state.json, announce explicitly which stage it's resuming from (and what was last attempted), and pick up from that stage rather than restarting from `load`. It should not redo completed stages or overwrite the existing state.json's history.",
+      "files": ["tasks-csvdiff/01-walking-skeleton-keyed-csvdiff.md", "tasks-csvdiff/01-walking-skeleton-keyed-csvdiff.state.json (synthetic, with current_stage=review after verify passed)"]
+    }
+  ]
+}

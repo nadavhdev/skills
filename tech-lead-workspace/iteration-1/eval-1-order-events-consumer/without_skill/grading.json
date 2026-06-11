@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-order-projections-service.md exists in outputs/ directory"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document is substantially longer than 1500 words, with 17 detailed sections including extensive prose, tables, and code blocks"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section 2 'Problem statement & scope' and Section 3 'Background and constraints (calibrated)'"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section 2.1 'What we are building' and 2.2 'What we are explicitly not building (this milestone)' enumerate both"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section 5 'High-level architecture' with full diagram and component breakdown"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Sections 6 'Consumer design' and 7 'Storage' provide deeply substantive detail including reducer model, CAS write pseudocode, schema DDL"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section 7.2 table compares DynamoDB, Spanner, Cloud SQL, Firestore, Bigtable, Redis with rejection rationale for each"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section 4.2 lists NFR-1 read p99 < 50ms, NFR-2 freshness p95 < 2s, NFR-3 99.95% availability, NFR-6 backfill ≤ 2h"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section 12 'Failure modes and how we handle them' with detection/behavior/recovery table"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section 15 'Rollout plan' with 16-week milestone schedule and 15.1 'Rollback'"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section 14 'Observability' with metrics, tracing, logs, SLOs, dashboards subsections"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section 16 'Open questions and dependencies' lists 11 specific entries including sequence field, producer idempotency, retention, PII"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "No invented internal URLs; only the actual API path /orders/{order_id}/projection and admin endpoint are mentioned"
+    },
+    {
+      "text": "TDD is structured as an event-driven / streaming consumer design",
+      "passed": true,
+      "evidence": "Designed around Kafka topic consumption with one consumer group, partition workers, DLQ topic, and reducer over event stream"
+    },
+    {
+      "text": "Explicitly states delivery semantics (at-least-once + idempotent processing) and what makes effects idempotent",
+      "passed": true,
+      "evidence": "Section 3 states 'Delivery semantics: at-least-once. Duplicates are guaranteed; the consumer must be idempotent.' Section 6.3 details event_id dedup + last_applied_sequence CAS as idempotency mechanisms"
+    },
+    {
+      "text": "Discusses per-partition ordering and partition key choice (order_id) and what that buys",
+      "passed": true,
+      "evidence": "Section 3 notes 'topic is keyed by order_id and a single key always lands on a single partition; Kafka guarantees per-partition order.' Section 6.4 enforces one worker per partition"
+    },
+    {
+      "text": "Specifies a consumer lag SLO with a concrete number",
+      "passed": true,
+      "evidence": "NFR-2 freshness p95 < 2s with alert at 1.5s; NFR-3 'consumer lag < 30s' availability condition"
+    },
+    {
+      "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path",
+      "passed": true,
+      "evidence": "Section 6.6 defines orders.events.dlq.v1 with reason taxonomy (invalid_transition, sequence_gap_timeout, cas_storm, decode_error, unknown_event_type); replay path via §8 tool"
+    },
+    {
+      "text": "Specifies offset commit strategy (after processing / batch / at-least-once semantics)",
+      "passed": true,
+      "evidence": "Section 6.7 'enable.auto.commit=false; we commit synchronously after successful store write'; Section 6.3 step 6 'Commit the Kafka offset only after the write succeeds'"
+    },
+    {
+      "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs, not punted",
+      "passed": true,
+      "evidence": "Section 7.3 explicitly recommends Cloud Spanner as primary, rejects DynamoDB (cross-cloud), and identifies Cloud SQL Postgres as fallback if cost vetoed"
+    },
+    {
+      "text": "Addresses Avro schema evolution under BACKWARDS compatibility",
+      "passed": true,
+      "evidence": "Section 11 'Schema evolution': 'Input events: governed by Confluent SR with BACKWARDS compat. The consumer is built against the latest schema; old events deserialize cleanly because new fields are optional with defaults.'"
+    },
+    {
+      "text": "Addresses out-of-order event handling within partition (sequence numbers / event-timestamp last-writer-wins / state-machine guards)",
+      "passed": true,
+      "evidence": "Section 6.2 mandates per-order_id monotonic sequence number; Section 6.3 uses sequence for staleness drop and CAS guard; Section 6.5 introduces park buffer for gaps"
+    },
+    {
+      "text": "Designs back-fill / full-replay path for initial seed and recovery",
+      "passed": true,
+      "evidence": "Section 8 covers single-order replay (8.1) and full backfill (8.2) with shadow-table approach and 2h throughput target"
+    },
+    {
+      "text": "Designs the GET /orders/{id}/projection read endpoint with latency target",
+      "passed": true,
+      "evidence": "Section 9 specifies the endpoint contract with auth, JSON response shape, 404/503 semantics, staleness headers; NFR-1 sets p99 < 50ms latency target"
+    }
+  ],
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "total": 24,
+    "pass_rate": 1.0
+  }
+}

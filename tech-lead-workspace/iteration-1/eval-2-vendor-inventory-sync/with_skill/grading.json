@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-vendor-inventory-sync.md exists at outputs/ path"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document is extensive, covering 10 sections with detailed subsections, easily exceeding 1500 words"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem & context' exists describing $80K/month CX incidents and stale Google Sheet"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section 2 has explicit 'In scope' and 'Out of scope' bullet lists"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '3. High-level approach' with pipeline diagram and three adapter pattern overview"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section 4 has subsections 4a-4h covering schedule, cursors, adapters, concurrency, processing, backpressure, data model, capacity"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section 5 lists 7 alternatives (A-G) including Airflow, webhooks, IMAP, Kafka, bypass catalog DB, each with rejection rationale"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section 6 includes concrete numbers: p95 run < 5 min, 2x poll_cadence freshness, $500/month budget alert, 26h Vendor K staleness"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section 7 'Risks & failure modes' has a table with 12 risks (R1-R12) with likelihood, blast radius, mitigation, recovery"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section, addressing the shadow-mode period from the PRD",
+      "passed": true,
+      "evidence": "Section 8 'Rollout & migration' includes 6-week phasing table and 'Shadow mode mechanics' with shadow_mode flag per vendor"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section 9 'Observability & operations' has dashboards, alerts table (PagerDuty), and runbook items"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section 10 'Open questions' has 10 entries including catalog API idempotency, shadow-mode arbitration, discontinued SKU surface"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "Only placeholder '<link to confluence runbook — to be added>' and example domain inventory-k@vendors.<our-domain> with explicit placeholder"
+    },
+    {
+      "text": "TDD is structured as a scheduled pull-based processing design",
+      "passed": true,
+      "evidence": "Section 0 explicitly states 'Dominant pattern: scheduled pull-based processing' referring to references/tdd-scheduled-pull.md"
+    },
+    {
+      "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email) — does not collapse them into 'all REST'",
+      "passed": true,
+      "evidence": "Sections 4c.1 (REST adapter, 8 vendors), 4c.2 (SFTP adapter, 3 vendors), 4c.3 (Email adapter, Vendor K) each have distinct treatments"
+    },
+    {
+      "text": "Proposes a per-vendor connector / adapter pattern (or equivalent abstraction) with shared core",
+      "passed": true,
+      "evidence": "Common 'InventorySource' interface with three adapter implementations; pull stages (fetch, normalise, diff, apply, audit) shared across all 12 vendors"
+    },
+    {
+      "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it",
+      "passed": true,
+      "evidence": "Section 4f dedicated to Vendor F: hourly cadence not 30-min, ≤55 calls per run with 5 headroom, chunked full-refresh across multiple hours"
+    },
+    {
+      "text": "Discusses per-vendor cursor / watermark / 'since' state, and how it's stored and recovered",
+      "passed": true,
+      "evidence": "Section 4b 'Cursor / watermark' defines vendor_sync_state table with last_cursor jsonb, adapter-specific cursor semantics, and recovery via S3 raw payloads"
+    },
+    {
+      "text": "Addresses no-overlap / locking between scheduled runs",
+      "passed": true,
+      "evidence": "Section 4d: 'Per-vendor lock: Redis SET NX PX', UUID-fenced; second Beat fire becomes no-op with skipped_due_to_lock_total metric"
+    },
+    {
+      "text": "Defines a freshness SLO and per-vendor stale-data alerting (24h+ stale = alarm)",
+      "passed": true,
+      "evidence": "NFR target: 'last_success_at no older than 2 × poll_cadence (e.g. 60 min for a 30-min vendor; 26h for Vendor K). Breach = page on-call' via vendor_staleness_minutes metric"
+    },
+    {
+      "text": "Addresses storage and rotation of per-vendor credentials",
+      "passed": true,
+      "evidence": "Section 4c.1 and 6/Security: 'stored in AWS Secrets Manager, one secret per vendor. Rotated per vendor's own policy; rotation is operator-driven, no automatic rotation in v1'"
+    },
+    {
+      "text": "Has a concrete plan for the emailed-CSV vendor (e.g., dedicated mailbox, automated parser, quarantine for malformed)",
+      "passed": true,
+      "evidence": "Section 4c.3: dedicated SES inbound address, DMARC/SPF/DKIM enforcement, S3 archival, SES messageId dedup, quarantine to vendor-k-needs-triage/ S3 prefix, 26h staleness alarm"
+    },
+    {
+      "text": "Designs the shadow-mode rollout phase (compare to current source of truth, dispute resolution)",
+      "passed": true,
+      "evidence": "Section 8 Shadow mode mechanics: shadow_mode=true per vendor, applied=false audit rows, daily disagreement report compared with Google Sheet, ops arbitrates; Open Q2 names the arbiter"
+    },
+    {
+      "text": "Designs the audit log of inventory changes with source and timestamp",
+      "passed": true,
+      "evidence": "Section 4g defines InventoryAudit table with run_id, vendor_id, internal_sku, old_qty, new_qty, source_observed_at, applied_at, monthly partitions"
+    }
+  ],
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "total": 24,
+    "pass_rate": 1.0
+  }
+}

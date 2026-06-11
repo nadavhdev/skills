@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No TDD-*.md file is created in the outputs/ directory",
+      "passed": true,
+      "evidence": "Directory listing shows only response.md exists; find command for TDD-*.md returned no results. The assistant deferred writing the file until answers were provided ('Send the answers (or the PRD if one exists) and I'll write `TDD-notifications-service.md` in the current directory.')."
+    },
+    {
+      "text": "The assistant's final response explicitly states it will not / cannot draft a TDD without a PRD",
+      "passed": false,
+      "evidence": "The response opens with 'Happy to write this TDD' and does not refuse. It conditionally proceeds: 'If you can answer the six above in a single reply tonight, I'll have a solid draft ready' — i.e., it asks for triage answers rather than refusing without a PRD."
+    },
+    {
+      "text": "The refusal explains the reason — that designing without a PRD would mean inventing the requirements, or equivalent reasoning",
+      "passed": true,
+      "evidence": "Although there is no refusal, the reasoning is present: 'drafting without them means I'd be inventing requirements' (line 3). This matches the substance of the assertion even though it is framed as a caveat, not a refusal."
+    },
+    {
+      "text": "The refusal offers concrete fallback options (paste the PRD, give a file path, give a URL, or help write the PRD)",
+      "passed": true,
+      "evidence": "Line 3: 'If there's an actual PRD doc — Notion, Google Doc, Confluence, a markdown file — point me at it and I'll pull from it. If there isn't one yet, that's also fine...' Concrete fallbacks (point to the doc, or proceed with answers to triage questions) are offered."
+    },
+    {
+      "text": "The response does not contain a drafted TDD inline (no section headers like '## Problem', '## Detailed design', '## NFRs', no skeleton filled in)",
+      "passed": true,
+      "evidence": "Response contains no TDD section headers like '## Problem', '## Detailed design', or '## NFRs'. Headers used are conversational ('**On the PRD.**', '**On project conventions.**', '**Triage questions...**'). No skeleton is filled in."
+    },
+    {
+      "text": "The response does NOT 'fill in reasonable defaults', 'start from what was shared', or batch-ask triage questions and then proceed to draft",
+      "passed": false,
+      "evidence": "Response explicitly batch-asks triage questions and signals intent to proceed: 'Triage questions I need answered before drafting' (line 14) lists 6 questions, then 'If you can answer the six above in a single reply tonight, I'll have a solid draft ready' (line 31). Also lists defaults it plans to fill in: 'A few things I'm not asking upfront because I can put reasonable defaults in the TDD' (line 23)."
+    },
+    {
+      "text": "Does not classify the workload type or pick a category reference before having a PRD in hand",
+      "passed": false,
+      "evidence": "Response explicitly classifies workload types under '**On the workload classification.**' (line 7): 'Transactional push notifications... this is an event-driven consumer' and 'Promotional email campaigns — this is a batch / async-worker pattern'. Classification done without a PRD."
+    },
+    {
+      "text": "The refusal is a single, clear, direct message — not a several-paragraph essay or hedge",
+      "passed": false,
+      "evidence": "Response is a multi-section, several-paragraph message spanning 33 lines with bolded subsections ('On the PRD', 'On project conventions', 'On the workload classification', 'Triage questions...', 'On the timeline'), six numbered triage questions, and a defaults list. It is a long hedge, not a single direct refusal."
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 4,
+    "total": 8,
+    "pass_rate": 0.5
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "order-events-consumer-tdd",
+  "prompt": "Need a tech design for the order projections service. PRD: /Users/nhoze/.claude/skills/tech-lead/evals/prd-order-events-consumer.md. The team is leaning toward DynamoDB for the store but i'd like a real principal-level take on storage AND on the consumer guarantees (we keep getting bitten by out-of-order events). Write it as a markdown file in this dir.",
+  "assertions": [
+    {"id": "file_exists",             "text": "A single TDD-*.md file exists in the outputs/ directory"},
+    {"id": "min_word_count",          "text": "Document is at least 1500 words"},
+    {"id": "has_problem_context",     "text": "Contains a 'Problem' / 'Context' / 'Background' section"},
+    {"id": "has_scope",               "text": "Contains a 'Scope' section with both in-scope and out-of-scope items"},
+    {"id": "has_high_level",          "text": "Contains a 'High-level approach' / 'Overview' section"},
+    {"id": "has_detailed_design",     "text": "Contains a 'Detailed design' section with substantive content"},
+    {"id": "has_alternatives",        "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each"},
+    {"id": "has_nfrs",                "text": "Contains an NFRs section with concrete targets (numbers/SLOs)"},
+    {"id": "has_risks",               "text": "Contains a 'Risks' / 'Failure modes' section"},
+    {"id": "has_rollout",             "text": "Contains a 'Rollout' / 'Migration' section"},
+    {"id": "has_observability",       "text": "Contains an 'Observability' / 'Operations' section"},
+    {"id": "has_open_questions",      "text": "Contains 'Open questions' with at least one entry"},
+    {"id": "no_fabricated_urls",      "text": "No fabricated/invented URLs to internal systems"},
+    {"id": "category_event_driven",   "text": "TDD is structured as an event-driven / streaming consumer design"},
+    {"id": "delivery_semantics",      "text": "Explicitly states delivery semantics (at-least-once + idempotent processing) and what makes effects idempotent"},
+    {"id": "partition_ordering",      "text": "Discusses per-partition ordering and partition key choice (order_id) and what that buys"},
+    {"id": "consumer_lag_slo",        "text": "Specifies a consumer lag SLO with a concrete number"},
+    {"id": "dlq_design",              "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path"},
+    {"id": "offset_commit_strategy",  "text": "Specifies offset commit strategy (after processing / batch / at-least-once semantics)"},
+    {"id": "storage_decision",        "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs, not punted"},
+    {"id": "schema_evolution",        "text": "Addresses Avro schema evolution under BACKWARDS compatibility"},
+    {"id": "out_of_order_handling",   "text": "Addresses out-of-order event handling within partition (sequence numbers / event-timestamp last-writer-wins / state-machine guards)"},
+    {"id": "backfill_replay_design",  "text": "Designs back-fill / full-replay path for initial seed and recovery"},
+    {"id": "read_api_design",         "text": "Designs the GET /orders/{id}/projection read endpoint with latency target"}
+  ]
+}

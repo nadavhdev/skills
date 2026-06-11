@@ -1,0 +1,33 @@
+{
+  "eval_id": 2,
+  "eval_name": "vendor-inventory-sync-tdd",
+  "prompt": "I want a TDD for the vendor inventory sync project. The PRD is at /Users/nhoze/.claude/skills/tech-lead/evals/prd-vendor-inventory-sync.md. Note the weird situation - 12 vendors, 3 different ingestion mechanisms, one of them is literally an emailed CSV. I need the design to honestly handle that mess, not pretend everything is a clean REST API. write to current dir.",
+  "assertions": [
+    {"id": "file_exists",              "text": "A single TDD-*.md file exists in the outputs/ directory"},
+    {"id": "acknowledges_prd",         "text": "Before drafting, the assistant explicitly acknowledges having read the PRD with a one-line summary"},
+    {"id": "min_word_count",           "text": "Document is at least 1500 words"},
+    {"id": "has_problem_context",      "text": "Contains a 'Problem' / 'Context' / 'Background' section"},
+    {"id": "has_scope",                "text": "Contains a 'Scope' section with both in-scope and out-of-scope items"},
+    {"id": "has_high_level",           "text": "Contains a 'High-level approach' / 'Overview' section"},
+    {"id": "has_detailed_design",      "text": "Contains a 'Detailed design' section with substantive content"},
+    {"id": "has_alternatives",         "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale"},
+    {"id": "has_nfrs",                 "text": "Contains an NFRs section with concrete targets"},
+    {"id": "nfrs_explicit_na",         "text": "NFRs section visibly accounts for every NFR — either a target or explicit 'N/A — reason'"},
+    {"id": "has_risks",                "text": "Contains a 'Risks' / 'Failure modes' section"},
+    {"id": "has_rollout",              "text": "Contains a 'Rollout' section addressing shadow-mode period from the PRD"},
+    {"id": "has_observability",        "text": "Contains an 'Observability' / 'Operations' section"},
+    {"id": "has_open_questions",       "text": "Contains 'Open questions' with at least one entry"},
+    {"id": "no_fabricated_urls",       "text": "No fabricated/invented URLs"},
+    {"id": "category_scheduled_pull",  "text": "TDD is structured as a scheduled pull-based processing design"},
+    {"id": "acknowledges_three_mechs", "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email)"},
+    {"id": "per_vendor_connector",     "text": "Proposes a per-vendor connector / adapter pattern with shared core"},
+    {"id": "rate_limit_aware",         "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it"},
+    {"id": "watermark_per_vendor",     "text": "Discusses per-vendor cursor / watermark / 'since' state"},
+    {"id": "no_overlap_locking",       "text": "Addresses no-overlap / locking between scheduled runs"},
+    {"id": "freshness_slo_alerting",   "text": "Defines a freshness SLO and per-vendor stale-data alerting"},
+    {"id": "secret_management",        "text": "Addresses storage and rotation of per-vendor credentials"},
+    {"id": "email_vendor_plan",        "text": "Has a concrete plan for the emailed-CSV vendor"},
+    {"id": "shadow_mode_design",       "text": "Designs the shadow-mode rollout phase"},
+    {"id": "audit_log_design",         "text": "Designs the audit log of inventory changes"}
+  ]
+}

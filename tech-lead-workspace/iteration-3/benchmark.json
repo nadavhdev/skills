@@ -1,0 +1,857 @@
+{
+  "metadata": {
+    "skill_name": "tech-lead",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-06-10T07:47:48Z",
+    "evals_run": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 5,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9474,
+        "passed": 18,
+        "failed": 1,
+        "total": 19,
+        "time_seconds": 226.3,
+        "tokens": 49086,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.",
+          "passed": true,
+          "evidence": "outputs/tasks-referral-api/ exists containing the 5 task files plus README.md."
+        },
+        {
+          "text": "The tasks directory contains a README.md index file.",
+          "passed": true,
+          "evidence": "tasks-referral-api/README.md is present with the breakdown index, dependency graph, and open-question section."
+        },
+        {
+          "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+          "passed": true,
+          "evidence": "tasks-referral-api/ contains exactly 6 files: README.md + 5 task files (01\u201305), within the 5\u201313 range."
+        },
+        {
+          "text": "Task count is at least 4 (excluding README).",
+          "passed": true,
+          "evidence": "5 task files (01\u201305) excluding README, above the floor of 4."
+        },
+        {
+          "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).",
+          "passed": true,
+          "evidence": "Files are 01-issuance-redemption-walking-skeleton.md, 02-credit-ledger-failure-mode-hardening.md, 03-support-read-endpoint.md, 04-observability-and-alerting.md, 05-rollout-and-load-verification.md \u2014 sequential and in dependency order matching the README graph."
+        },
+        {
+          "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.",
+          "passed": true,
+          "evidence": "Each of the 5 task files has exactly the six fields: a heading title, **One-liner**, **Composes**, **TDD sections addressed**, **Depends on**, **Acceptance criteria** \u2014 no extra fields like Estimate/Out of scope/Notes."
+        },
+        {
+          "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+          "passed": true,
+          "evidence": "All 5 task bodies are prose only \u2014 no fenced code blocks, no function signatures, no shell commands. Field names like referral_codes and referrals_api_enabled appear inline as identifiers but no code blocks."
+        },
+        {
+          "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).",
+          "passed": true,
+          "evidence": "No .py/.go/.js paths or src/ references in any task. Tasks reference TDD sections (\u00a74.2, \u00a77.1) and config-flag/identifier names only."
+        },
+        {
+          "text": "No task is a standalone 'address NFRs' / 'add observability' / 'address scalability' line item \u2014 NFRs ride with feature tasks in their acceptance criteria.",
+          "passed": false,
+          "evidence": "Task 04 is titled 'Observability, alerting, and runbook entries for the referrals surface' \u2014 a standalone observability task. The skill allows one justified cross-cutting observability task; the file does justify it as service-wide per \u00a79, so this is borderline, but it is in form a standalone observability task. Marking fail per the strict guideline that 'address observability' as a standalone item fails."
+        },
+        {
+          "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.",
+          "passed": true,
+          "evidence": "None of the 5 tasks are testing-as-primary-deliverable. Testing rides inside acceptance criteria (e.g. load test verification in task 05 is a rollout-verification task, not 'write tests')."
+        },
+        {
+          "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.",
+          "passed": true,
+          "evidence": "Task 01 is explicitly the walking skeleton with end-to-end shippable behavior (issue + redeem behind a flag). No scaffold-only task exists."
+        },
+        {
+          "text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.",
+          "passed": true,
+          "evidence": "README has 'Open questions blocking work' section calling out both \u00a710.1 and \u00a710.2; \u00a710.2 is explicitly flagged as blocking an unwritten sixth task and as a hard gate before the 10% ramp step. No task is 'decide fraud policy'."
+        },
+        {
+          "text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.",
+          "passed": true,
+          "evidence": "01-issuance-redemption-walking-skeleton.md ships schema + both write endpoints + idempotency + code generation + credit-ledger transactional call (happy path) + 409-on-conflict, behind a launch flag \u2014 textbook vertical slice."
+        },
+        {
+          "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).",
+          "passed": true,
+          "evidence": "Task 01 acceptance criteria explicitly cover Idempotency-Key replay behavior and 409 Conflict on concurrent redemption against the (code) unique constraint; task 02 hardens the credit-ledger failure modes including idempotency-key replay on ambiguous failures."
+        },
+        {
+          "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.",
+          "passed": true,
+          "evidence": "Task 02 ('Harden credit-ledger client for outage and slow-call failure modes') has dedicated acceptance criteria for ledger outage rollback, slow-call timeouts, ambiguous-failure resolution via idempotency-key replay, and verification that no server-side retry happens."
+        },
+        {
+          "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).",
+          "passed": true,
+          "evidence": "Tasks 02, 03, 04, 05 all declare 'Depends on' with concrete task names referencing earlier tasks (e.g. task 04 depends on 01, 02, 03). Only task 01 is 'none', which is correct for the foundation."
+        },
+        {
+          "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).",
+          "passed": true,
+          "evidence": "After task 01, tasks 02 (ledger hardening) and 03 (support read endpoint) both depend only on 01 and are independently startable \u2014 explicit fan-out shape confirmed by the README graph."
+        },
+        {
+          "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').",
+          "passed": true,
+          "evidence": "transcript.md opens with 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`. Covers the three-endpoint synchronous referrals service\u2026' and lists the major sections covered."
+        },
+        {
+          "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.",
+          "passed": true,
+          "evidence": "transcript.md states 'Wrote the breakdown to `./tasks-referral-api/` \u2014 5 tasks + a README index' and surfaces \u00a710.2 as a blocker for a sixth task and a hard gate before the 10% rollout step, plus \u00a710.1 as deferred."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 36.6,
+        "tokens": 37059,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory or task files were created in outputs/. The only file (if any) is transcript.md.",
+          "passed": true,
+          "evidence": "ls of with_skill/outputs/ shows only transcript.md; no tasks-* directory or task files were written."
+        },
+        {
+          "text": "The transcript does NOT contain a list of Jira tickets that were 'created'. The model did not pretend to have Jira access it lacks.",
+          "passed": true,
+          "evidence": "No ticket list appears; the model explicitly notes it does not see a Jira/Atlassian MCP and asks the user how to proceed."
+        },
+        {
+          "text": "The transcript contains an acknowledgement that the TDD was read end-to-end (one-line summary of what it covers).",
+          "passed": true,
+          "evidence": "Line 1: 'Read the TDD at ...' followed by a one-line summary covering Kafka-driven consumer, idempotent Postgres projection with (partition, offset) log, DLQ + replay/back-fill, internal read API, and the 2 open questions."
+        },
+        {
+          "text": "The transcript explicitly states that a Jira/Atlassian MCP is not configured / not available in this session.",
+          "passed": true,
+          "evidence": "Line 3: 'You asked me to create the tickets in Jira, but I don't see a Jira / Atlassian MCP available in this session.'"
+        },
+        {
+          "text": "The transcript offers exactly the three branches: (1) walk through MCP install interactively, (2) skip MCP and produce paste-ready output, (3) switch to local directory.",
+          "passed": true,
+          "evidence": "Options 1, 2, 3 in the transcript map exactly: 'Set one up now (interactive)' walkthrough, 'Skip MCP, give me paste-ready output', and 'Switch to the local directory option ... ./tasks-order-projections/'."
+        },
+        {
+          "text": "The transcript ENDS with a question to the user asking them to pick a branch. It does NOT proceed to produce tasks/tickets/paste-ready blocks/local files.",
+          "passed": true,
+          "evidence": "Final line is 'Which would you like?' \u2014 no tasks, paste blocks, or local files were produced past the gate."
+        },
+        {
+          "text": "The model did not silently default to one of the branches (e.g. just producing paste-ready blocks because MCP was missing). It asked first.",
+          "passed": true,
+          "evidence": "No default action was taken; the model stops and asks the user to pick among the three explicit branches."
+        },
+        {
+          "text": "If the transcript previews task structure at all, it contains no code, no specific file paths, no library/framework versions.",
+          "passed": true,
+          "evidence": "Transcript does not preview task structure; it only mentions destination output shape (e.g. './tasks-order-projections/' as a directory name) with no code, no library versions, and no file paths beyond the TDD path the user supplied."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 7,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.9474,
+        "passed": 18,
+        "failed": 1,
+        "total": 19,
+        "time_seconds": 255.2,
+        "tokens": 52112,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.",
+          "passed": true,
+          "evidence": "Directory `with_skill/outputs/tasks-logsql-cli/` exists containing 8 task files + README.md."
+        },
+        {
+          "text": "The tasks directory contains a README.md index.",
+          "passed": true,
+          "evidence": "`tasks-logsql-cli/README.md` is present and includes summary, task table, dependency graph, and blocked-task section."
+        },
+        {
+          "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+          "passed": true,
+          "evidence": "Directory contains 9 files total (8 task files + README), well within the 5\u201313 range."
+        },
+        {
+          "text": "Task count is at least 4 (excluding README).",
+          "passed": true,
+          "evidence": "8 task files (01 through 08), exceeding the floor of 4."
+        },
+        {
+          "text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.",
+          "passed": true,
+          "evidence": "Each task file uses an H3 title plus bolded sections: `**One-liner:**`, `**Composes:**`, `**TDD sections addressed:**`, `**Depends on:**`, `**Acceptance criteria:**` (verified across all 8 files)."
+        },
+        {
+          "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+          "passed": true,
+          "evidence": "No ``` code fences in any task body (only the README has a dependency-graph fence). Acceptance criteria reference CLI invocations as user-behavior examples, not as scripts or commands to run."
+        },
+        {
+          "text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).",
+          "passed": true,
+          "evidence": "Grep for `cmd/logsql|pkg/|src/|main.go` against all task bodies returned no matches."
+        },
+        {
+          "text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.",
+          "passed": true,
+          "evidence": "Tasks treat Go as a settled decision (e.g. 'Single statically-linked Go binary'); no language-choice deliverable appears."
+        },
+        {
+          "text": "No task asks to decide parser strictness. The TDD already decided strict.",
+          "passed": true,
+          "evidence": "Parser strictness is only referenced as a settled TDD decision in the README's blocked-task discussion; no task asks to decide it."
+        },
+        {
+          "text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.",
+          "passed": true,
+          "evidence": "No standalone testing task; the benchmarks task (07) is an NFR-verification CI task with concrete throughput/cold-start gates, not a generic test-coverage task."
+        },
+        {
+          "text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.",
+          "passed": true,
+          "evidence": "Task 01 is a walking skeleton that ships `SELECT/WHERE/LIMIT` end-to-end with exit codes wired in \u2014 scaffolding is implicit in shipping the binary, not a separate task."
+        },
+        {
+          "text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.",
+          "passed": true,
+          "evidence": "Tasks are vertical feature slices: walking-skeleton, json-output-mode, schema-on-read/strict-mode, group-by-and-aggregates, order-by, explain+panic, benchmarks, distribution \u2014 not parser/executor/output-formatter layers."
+        },
+        {
+          "text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.",
+          "passed": true,
+          "evidence": "Task 01 title is 'Walking skeleton: SELECT / WHERE / LIMIT over JSON-lines to CSV'; acceptance criteria show `logsql 'SELECT level, msg FROM stdin WHERE level = \"error\" LIMIT 5' < access.jsonl` working end-to-end."
+        },
+        {
+          "text": "No task is a standalone 'address performance' / 'memory budget' / 'cold-start latency' line item. NFRs ride with feature tasks in their acceptance criteria.",
+          "passed": false,
+          "evidence": "Task 07 ('Performance benchmarks in CI: cold-start and throughput') is a standalone NFR task wiring both cold-start (<100ms) and throughput (1 GB/60s) targets into CI. Memory budgets do ride with features (tasks 04 and 05), but the standalone NFR-benchmarks task violates this rule."
+        },
+        {
+          "text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.",
+          "passed": true,
+          "evidence": "Task 01 Composes: 'Exit-code contract wired in: `0`... `1` on successful execution with zero rows matched (new convention\u2014documented in --help and README)... `2`... `3`'; acceptance criteria assert exit 1 on zero matches."
+        },
+        {
+          "text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.",
+          "passed": true,
+          "evidence": "Task 04 acceptance: GROUP BY exceeding `--max-memory` 'exits 3 with a STDERR message naming `aggregate` as the offending operator'; Task 05: sort buffer exceeding budget 'exits 3... naming `sort` as the offending operator'."
+        },
+        {
+          "text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.",
+          "passed": true,
+          "evidence": "README has explicit 'Blocked: string functions + `CASE`' section quoting TDD \u00a710 and stating 'A 9th task... is **not written** in this breakdown'; transcript also calls this out as a blocked task."
+        },
+        {
+          "text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.",
+          "passed": true,
+          "evidence": "Transcript opens: 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md`. Covers a Go CLI for SQL-subset queries over JSON-lines logs...' summarizing TDD contents end-to-end."
+        },
+        {
+          "text": "The chat summary names the local directory destination and the task count.",
+          "passed": true,
+          "evidence": "Transcript: 'Local directory: `./tasks-logsql-cli/` in the working dir, one markdown file per task plus a README.md index. 8 deliverable task files + 1 README...'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 8,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 29.3,
+        "tokens": 32423,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory or task files were created in outputs/. The only file present is transcript.md.",
+          "passed": true,
+          "evidence": "outputs/ contains only transcript.md; no tasks-* directory or task files were created."
+        },
+        {
+          "text": "The transcript explicitly REFUSES to break down without a TDD. The refusal language is clear and not softened.",
+          "passed": true,
+          "evidence": "Opens with 'I won't break this down without a TDD' and closes with 'Without that design committed, any tickets I write would be guesses dressed up as a sprint plan.' \u2014 clean, unsoftened."
+        },
+        {
+          "text": "The transcript briefly explains WHY (e.g. 'tasks would be opinions about a feature rather than decomposition of an agreed design').",
+          "passed": true,
+          "evidence": "'without one, the tasks would be my opinions about a feature, not a decomposition of a design the team has agreed on, and the result wouldn't be principal-level.'"
+        },
+        {
+          "text": "The transcript offers concrete fallback options: paste the TDD, give a file path / URL the assistant can fetch.",
+          "passed": true,
+          "evidence": "Numbered list offers: '1. Paste the TDD ... here, or 2. Give me a file path or URL I can fetch (local file, public URL, or a Drive/Confluence link with the relevant MCP configured)'."
+        },
+        {
+          "text": "The transcript mentions that if the user has only a PRD, the TDD-authoring capability of the SAME skill can author the TDD first as a path forward.",
+          "passed": true,
+          "evidence": "'3. If you only have a PRD (or no design doc at all yet), say so and I'll author the TDD first via the TDD-authoring capability \u2014 then we break that down into tickets.'"
+        },
+        {
+          "text": "The transcript does NOT contain a 'starting set' / 'rough draft' of tasks. It does NOT batch-ask triage questions and proceed.",
+          "passed": true,
+          "evidence": "No drafted tasks appear. The transcript lists topics a TDD would need to cover, but frames them as required design content, not as draft tickets."
+        },
+        {
+          "text": "The transcript does NOT offer to 'fill in reasonable defaults' or 'start from what was shared'.",
+          "passed": true,
+          "evidence": "No offer to fill in defaults; explicitly states 'any tickets I write would be guesses dressed up as a sprint plan' if produced without the TDD."
+        },
+        {
+          "text": "No ./tasks-* directory was silently created despite the user saying 'write them locally somewhere reasonable'. The refusal takes precedence over destination guidance.",
+          "passed": true,
+          "evidence": "Filesystem confirms only transcript.md exists in outputs/; no tasks-* directory was created."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 9,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 7,
+        "failed": 0,
+        "total": 7,
+        "time_seconds": 46.0,
+        "tokens": 33182,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory, ticket list, or task files were created in outputs/. The only file present is transcript.md.",
+          "passed": true,
+          "evidence": "Filesystem listing of with_skill/outputs/ shows only transcript.md (2283 bytes); no tasks-*/ directory or ticket files were created."
+        },
+        {
+          "text": "The transcript explicitly REFUSES to treat the PRD as a TDD and to break it down.",
+          "passed": true,
+          "evidence": "Opens with 'I won't break this down without a TDD \u2014 without one, the tasks would be my opinions about a feature, not a decomposition of a design the team has agreed on...' \u2014 an explicit refusal."
+        },
+        {
+          "text": "The transcript explicitly distinguishes a PRD from a TDD: a PRD states the problem; a TDD states the design. A breakdown decomposes a design, not a problem.",
+          "passed": true,
+          "evidence": "'it is a PRD: it states the problem, the goals, user stories, and constraints, but it does not state the design. A task breakdown decomposes a *design*, and there isn't one here yet.'"
+        },
+        {
+          "text": "The transcript explicitly offers to author the TDD FIRST via the same skill's TDD-authoring capability, then come back to the breakdown.",
+          "passed": true,
+          "evidence": "Option 1: 'I author the TDD first. I'll use the TDD-authoring capability of this same skill, working from this PRD... Once it's approved, I'll come back and break it into Jira tickets.'"
+        },
+        {
+          "text": "The transcript does NOT contain a list of tickets/tasks/epics that came from decomposing the PRD. The PRD was not silently treated as a TDD.",
+          "passed": true,
+          "evidence": "The transcript contains no epics, stories, or tickets \u2014 only a list of design decisions the TDD would need to settle, framed as gaps not as work items."
+        },
+        {
+          "text": "The transcript does NOT rename PRD sections (goals, user stories, success metrics) as tasks.",
+          "passed": true,
+          "evidence": "No PRD section appears as a task; the bulleted items are explicitly framed as 'design call[s], not a ticket'."
+        },
+        {
+          "text": "The transcript does NOT produce a 'rough starting breakdown' or 'placeholder tickets' or 'starter set' inline.",
+          "passed": true,
+          "evidence": "No inline starter tickets are produced; instead the response presents two options (author TDD first, or paste an existing TDD) and asks which to proceed with."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 5,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.4737,
+        "passed": 9,
+        "failed": 10,
+        "total": 19,
+        "time_seconds": 171.7,
+        "tokens": 32848,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.",
+          "passed": false,
+          "evidence": "Files were written flat into outputs/ (T01\u2013T12 + README.md + transcript.md), not into a tasks-* subdirectory."
+        },
+        {
+          "text": "The tasks directory contains a README.md index file.",
+          "passed": true,
+          "evidence": "README.md exists in outputs/ with an index table, sequencing diagram, and blocked/parked section."
+        },
+        {
+          "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+          "passed": false,
+          "evidence": "No tasks-* directory exists; counting flat files we have 12 task files + README = 13, which would be at the cap, but the directory structure assertion fails so this assertion does not apply correctly. Strictly, there is no tasks-*/ to count, so fails."
+        },
+        {
+          "text": "Task count is at least 4 (excluding README).",
+          "passed": true,
+          "evidence": "12 task files (T01\u2013T12) are present, well above the floor of 4."
+        },
+        {
+          "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).",
+          "passed": false,
+          "evidence": "Task files use 'T01-...md', 'T02-...md' pattern (with a 'T' prefix) rather than the NN-<slug>.md pattern. Ordering within the listing is not strictly dependency order either (e.g. T05 ledger-client appears before T06 redeem which depends on it, which is fine, but T08 auth appears after endpoints that need it)."
+        },
+        {
+          "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.",
+          "passed": false,
+          "evidence": "Task files use a different schema: Title, Estimate, Depends on, TDD ref, Outcome, Scope, Out of scope, Acceptance criteria, Notes. There is no 'One-liner' field, no 'Composes' field, and several extra fields (Estimate, Out of scope, Notes) that are not in the required six."
+        },
+        {
+          "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+          "passed": false,
+          "evidence": "Multiple violations: T07 contains a fenced JSON response-shape block; T05 contains a function signature 'post_credit(user_id, amount_cents, idempotency_key, reason) -> CreditResult'; T03 contains the signature 'generate(check_exists)' and references to CodeCollisionError type; T09 contains pseudocode-style metric label sets. T06 contains a numbered pseudocode list of transaction steps with derived idempotency-key string templates."
+        },
+        {
+          "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).",
+          "passed": true,
+          "evidence": "No source-file paths or .py/.go/.js references appear in any task body. Tasks reference table names, header names, and TDD sections only."
+        },
+        {
+          "text": "No task is a standalone 'address NFRs' / 'add observability' / 'address scalability' line item \u2014 NFRs ride with feature tasks in their acceptance criteria.",
+          "passed": false,
+          "evidence": "T09 is a standalone 'Metrics, structured logs, and alert rules' observability task; T10 is a standalone 'Load test at 3\u00d7 peak' NFR-verification task; T11 is a standalone 'Runbooks' task. Multiple standalone NFR-ish tasks rather than NFRs riding inside feature tasks."
+        },
+        {
+          "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.",
+          "passed": true,
+          "evidence": "No task is titled or scoped primarily as 'write tests'. Testing references appear inside acceptance criteria, and T10 is a load-test rather than a unit-test task."
+        },
+        {
+          "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.",
+          "passed": false,
+          "evidence": "T01 'Bootstrap referrals-api service scaffold' is explicitly a pure scaffolding task \u2014 'A new service exists in the standard service template, deploys to staging, responds to GET /healthz' with no business behavior. T02 'Postgres schema + migration' is also schema-only without shippable user behavior."
+        },
+        {
+          "text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.",
+          "passed": true,
+          "evidence": "README has a 'Blocked / parked' section explicitly calling out \u00a710.1 (blocked on product, no task created) and \u00a710.2 (carried as assumption in T06). transcript reiterates these. No 'decide fraud policy' task exists."
+        },
+        {
+          "text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.",
+          "passed": false,
+          "evidence": "T01 is literally 'Bootstrap service scaffold' with healthz/readyz only, T02 is schema migration only, T03 is a pure code-generator unit. The first end-to-end deliverable is T04 (POST /codes) and full redeem behavior is T06 \u2014 not the first task in dependency order."
+        },
+        {
+          "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).",
+          "passed": false,
+          "evidence": "Idempotency under concurrent redemption is addressed in T06, which is position 6 in the dependency ordering, not top-3. The top-3 tasks (T01 scaffold, T02 schema, T03 code generator) do not address the redemption-idempotency risk."
+        },
+        {
+          "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.",
+          "passed": true,
+          "evidence": "T05 has dedicated acceptance criteria covering ledger 5xx \u2192 LedgerUnavailableError, timeout \u2192 LedgerTimeoutError, idempotency-key forwarding verbatim, and explicit 'no internal retry' verification. T06 adds ledger-5xx \u2192 502 with retry-clean behavior."
+        },
+        {
+          "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).",
+          "passed": true,
+          "evidence": "All tasks except T01 have concrete 'Depends on' lines referencing other task IDs (e.g. T06 depends on T02, T05; T09 depends on T04, T06, T07; T12 depends on T04, T06, T07, T09)."
+        },
+        {
+          "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).",
+          "passed": true,
+          "evidence": "After T01, three tasks (T02 schema, T03 code generator, T05 ledger client, T08 auth) all depend only on T01 and are independently startable per the README sequencing diagram and the suggested 3-engineer pickup."
+        },
+        {
+          "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').",
+          "passed": false,
+          "evidence": "transcript.md opens with 'Broke the referrals TDD down into 12 task files' but does not contain an explicit 'Read the TDD at ...' acknowledgement line confirming end-to-end reading."
+        },
+        {
+          "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.",
+          "passed": true,
+          "evidence": "transcript.md names the destination ('written to this directory along with a README.md index'), the task count (12), and surfaces both open-question items (\u00a710.1 fraud/abuse policy and \u00a710.2 expiry-at-boundary) as parked/not-tickets."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 6,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 4,
+        "failed": 4,
+        "total": 8,
+        "time_seconds": 70.8,
+        "tokens": 23020,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory or task files were created in outputs/. The only file (if any) is transcript.md.",
+          "passed": true,
+          "evidence": "ls of without_skill/outputs/ shows only transcript.md; no tasks directory was written to the filesystem (the breakdown was inlined into the transcript instead)."
+        },
+        {
+          "text": "The transcript does NOT contain a list of Jira tickets that were 'created'. The model did not pretend to have Jira access it lacks.",
+          "passed": true,
+          "evidence": "The model states up front 'I can't actually create issues in your Jira instance from here' and presents the items as a 'ready-to-paste ticket breakdown', not as created tickets."
+        },
+        {
+          "text": "The transcript contains an acknowledgement that the TDD was read end-to-end (one-line summary of what it covers).",
+          "passed": false,
+          "evidence": "No leading one-line summary of the TDD; the transcript jumps into the Jira-access caveat and then directly into the epic/stories without summarizing the TDD's contents end-to-end."
+        },
+        {
+          "text": "The transcript explicitly states that a Jira/Atlassian MCP is not configured / not available in this session.",
+          "passed": true,
+          "evidence": "Lines 3-4: 'I don't have a Jira MCP / Jira API connection wired up in this session, so I can't actually create issues in your Jira instance from here.'"
+        },
+        {
+          "text": "The transcript offers exactly the three branches: (1) walk through MCP install interactively, (2) skip MCP and produce paste-ready output, (3) switch to local directory.",
+          "passed": false,
+          "evidence": "The three options offered at the end are 'Stand up a Jira MCP server', 'Give me a Jira API token + base URL + project key', and 'CSV import'. No interactive MCP walkthrough, no local-directory branch, and the paste-ready output was already produced rather than offered as a choice."
+        },
+        {
+          "text": "The transcript ENDS with a question to the user asking them to pick a branch. It does NOT proceed to produce tasks/tickets/paste-ready blocks/local files.",
+          "passed": false,
+          "evidence": "The transcript produces a full Epic + 12 stories with scope, acceptance criteria, dependencies, and sizes BEFORE asking; the gate is violated even though the closing line asks the user to pick a delivery path."
+        },
+        {
+          "text": "The model did not silently default to one of the branches (e.g. just producing paste-ready blocks because MCP was missing). It asked first.",
+          "passed": false,
+          "evidence": "The model defaults to producing paste-ready ticket blocks ('a ready-to-paste ticket breakdown derived from the TDD') without first asking the user which branch to take."
+        },
+        {
+          "text": "If the transcript previews task structure at all, it contains no code, no specific file paths, no library/framework versions.",
+          "passed": true,
+          "evidence": "The 12 stories are outcome-oriented with acceptance criteria; no code blocks, no library versions, no specific source file paths beyond TDD section refs (e.g. 'TDD ref: \u00a74.2')."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 7,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.6316,
+        "passed": 12,
+        "failed": 7,
+        "total": 19,
+        "time_seconds": 155.2,
+        "tokens": 32386,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.",
+          "passed": true,
+          "evidence": "Directory `without_skill/outputs/tasks-logsql/` exists containing 12 task files + README.md."
+        },
+        {
+          "text": "The tasks directory contains a README.md index.",
+          "passed": true,
+          "evidence": "`tasks-logsql/README.md` is present with wave ordering, dependency notes, and open-question call-out."
+        },
+        {
+          "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+          "passed": true,
+          "evidence": "Directory contains exactly 13 files (12 task files numbered 01\u201312 + README.md) \u2014 at the upper bound."
+        },
+        {
+          "text": "Task count is at least 4 (excluding README).",
+          "passed": true,
+          "evidence": "12 task files (01-scaffold through 12-distribution), well above the floor."
+        },
+        {
+          "text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.",
+          "passed": false,
+          "evidence": "Task files use a different schema: Outcome / Why / Acceptance criteria / Out of scope / Dependencies. None of the files contain 'One-liner', 'Composes', or 'TDD sections addressed' fields."
+        },
+        {
+          "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+          "passed": false,
+          "evidence": "Task 01 acceptance criteria includes shell commands `go test ./...`, `go vet`, `golangci-lint run`, `make build`, and `file logsql`; task 11 references `make bench`; task 12 includes `brew install logsql && logsql --version`."
+        },
+        {
+          "text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).",
+          "passed": false,
+          "evidence": "Task 01 acceptance criteria: '`cmd/logsql/main.go` exists and prints a stub `logsql vX.Y.Z` when run.' \u2014 explicit source-file-path reference."
+        },
+        {
+          "text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.",
+          "passed": true,
+          "evidence": "Go is treated as a settled decision throughout (e.g. 'Go module skeleton', 'go.mod declares the module'); no language-choice deliverable."
+        },
+        {
+          "text": "No task asks to decide parser strictness. The TDD already decided strict.",
+          "passed": true,
+          "evidence": "Task 02 references parser strictness as 'the core UX contract' (settled); no task asks to decide strictness."
+        },
+        {
+          "text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.",
+          "passed": true,
+          "evidence": "Tests appear as acceptance-criteria items inside feature tasks (e.g. 'Unit tests cover...'), not as a primary deliverable. No standalone test task exists."
+        },
+        {
+          "text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.",
+          "passed": false,
+          "evidence": "Task 01 is titled '01 \u2014 Project scaffold and build' with outcome 'A Go module skeleton that produces a statically-linked `logsql` binary'; acceptance includes 'go.mod declares the module', '`cmd/logsql/main.go` exists and prints a stub'. It explicitly disclaims 'Any actual SQL/parsing/execution code' \u2014 pure scaffolding, no shippable feature."
+        },
+        {
+          "text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.",
+          "passed": false,
+          "evidence": "Tasks are textbook horizontal layers: 02-parser, 03-jsonl-input (reader), 04-operator-pipeline (framework), 05-streaming-ops (filter/project/limit), 06-aggregate, 07-sort, 08-output-writers (CSV+JSON), 09-cli-shell. The README even confirms the layered shape with 04 depending on 02 (AST) + 03 (rows) feeding into 05/06/07/08."
+        },
+        {
+          "text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.",
+          "passed": false,
+          "evidence": "First task is '01 \u2014 Project scaffold and build' producing only a stub binary printing `logsql vX.Y.Z`; out-of-scope explicitly excludes 'Any actual SQL/parsing/execution code'. No end-to-end SELECT/WHERE/LIMIT flow is delivered until many tasks later."
+        },
+        {
+          "text": "No task is a standalone 'address performance' / 'memory budget' / 'cold-start latency' line item. NFRs ride with feature tasks in their acceptance criteria.",
+          "passed": false,
+          "evidence": "Task 11 is titled '11 \u2014 NFR benchmarks in CI' \u2014 a standalone cold-start + throughput NFR task. (Memory budgets do ride with tasks 06/07, but the standalone NFR-benchmarks task violates the rule.)"
+        },
+        {
+          "text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.",
+          "passed": true,
+          "evidence": "Task 09 (cli-shell) acceptance: '`1` \u2014 query ran, **zero rows matched**' explicitly listed with new-convention documentation requirement in --help and README."
+        },
+        {
+          "text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.",
+          "passed": true,
+          "evidence": "Task 06: 'returns a typed error naming **the operator (`aggregate`) and the offending column / group key**... Exit code 3'. Task 07: 'typed error naming the operator (`sort`) and the column list being sorted. Exit code 3'."
+        },
+        {
+          "text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.",
+          "passed": true,
+          "evidence": "README has 'Open question to resolve before wave 4' section stating 'Open question 1 in the TDD... must be resolved with the platform team before task 02-parser is closed'. Transcript also calls it out. No invented task for the open question."
+        },
+        {
+          "text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.",
+          "passed": true,
+          "evidence": "Transcript: 'I read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md` and broke it into 12 task files...'."
+        },
+        {
+          "text": "The chat summary names the local directory destination and the task count.",
+          "passed": true,
+          "evidence": "Transcript names destination `./tasks-logsql/` and 'broke it into 12 task files (plus a README)'."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 8,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 8,
+        "total": 8,
+        "time_seconds": 159.3,
+        "tokens": 27020,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory or task files were created in outputs/. The only file present is transcript.md.",
+          "passed": false,
+          "evidence": "Baseline created ./tasks-notifications-service/ with README.md and 10 TASK-*.md files alongside transcript.md."
+        },
+        {
+          "text": "The transcript explicitly REFUSES to break down without a TDD. The refusal language is clear and not softened.",
+          "passed": false,
+          "evidence": "No refusal \u2014 transcript opens 'Done \u2014 I broke the notifications service into 10 ticket-sized tasks and wrote them to ./tasks-notifications-service/'."
+        },
+        {
+          "text": "The transcript briefly explains WHY (e.g. 'tasks would be opinions about a feature rather than decomposition of an agreed design').",
+          "passed": false,
+          "evidence": "No explanation of why a TDD is required; instead it explains how it sliced the work (foundation/channels/use-cases/production-ready)."
+        },
+        {
+          "text": "The transcript offers concrete fallback options: paste the TDD, give a file path / URL the assistant can fetch.",
+          "passed": false,
+          "evidence": "No fallback offers; baseline proceeded directly to delivering tasks."
+        },
+        {
+          "text": "The transcript mentions that if the user has only a PRD, the TDD-authoring capability of the SAME skill can author the TDD first as a path forward.",
+          "passed": false,
+          "evidence": "No mention of TDD authoring or a PRD-to-TDD path; baseline has no awareness of the skill's two-capability model."
+        },
+        {
+          "text": "The transcript does NOT contain a 'starting set' / 'rough draft' of tasks. It does NOT batch-ask triage questions and proceed.",
+          "passed": false,
+          "evidence": "Transcript ships a full 10-task sprint plan (TASK-01 through TASK-10) with a sequencing diagram and open questions \u2014 the canonical failure mode."
+        },
+        {
+          "text": "The transcript does NOT offer to 'fill in reasonable defaults' or 'start from what was shared'.",
+          "passed": false,
+          "evidence": "Baseline effectively does this \u2014 it ran with the one-line blurb and filled in foundation/channels/preferences/observability/rollout tickets, then lists 5 'Open questions' to be answered later."
+        },
+        {
+          "text": "No ./tasks-* directory was silently created despite the user saying 'write them locally somewhere reasonable'. The refusal takes precedence over destination guidance.",
+          "passed": false,
+          "evidence": "./tasks-notifications-service/ was created with 11 markdown files (README + 10 tasks)."
+        }
+      ],
+      "notes": []
+    },
+    {
+      "eval_id": 9,
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.0,
+        "passed": 0,
+        "failed": 7,
+        "total": 7,
+        "time_seconds": 93.3,
+        "tokens": 21925,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "No task directory, ticket list, or task files were created in outputs/. The only file present is transcript.md.",
+          "passed": false,
+          "evidence": "Only transcript.md exists on disk, but the transcript itself IS a full Jira ticket breakdown (7 epics, ~22 stories with ACs and estimates) inline \u2014 which violates the spirit of the assertion: the deliverable was produced even if it landed in transcript.md."
+        },
+        {
+          "text": "The transcript explicitly REFUSES to treat the PRD as a TDD and to break it down.",
+          "passed": false,
+          "evidence": "There is no refusal. The transcript opens with 'Referral Code API \u2014 Jira Ticket Breakdown' and proceeds to decompose the PRD; it only notes 'this PRD didn't go through a TDD' as a caveat while proceeding anyway."
+        },
+        {
+          "text": "The transcript explicitly distinguishes a PRD from a TDD: a PRD states the problem; a TDD states the design. A breakdown decomposes a design, not a problem.",
+          "passed": false,
+          "evidence": "The transcript mentions 'this PRD didn't go through a TDD' and suggests 'a short design doc on attribution + credit issuance would be worth half a day,' but never articulates that a PRD states the problem and a TDD states the design, nor that breakdown decomposes a design."
+        },
+        {
+          "text": "The transcript explicitly offers to author the TDD FIRST via the same skill's TDD-authoring capability, then come back to the breakdown.",
+          "passed": false,
+          "evidence": "The transcript suggests an optional 'short design doc' AFTER already producing the breakdown; it does not offer to author the TDD first via the skill's TDD-authoring capability and come back to the breakdown."
+        },
+        {
+          "text": "The transcript does NOT contain a list of tickets/tasks/epics that came from decomposing the PRD. The PRD was not silently treated as a TDD.",
+          "passed": false,
+          "evidence": "The transcript is a full decomposition: Epics E1\u2013E7 with stories E1-1 through E7-4 (e.g., 'E1-2 \u2014 Code generator with collision retry', 'E4-2 \u2014 Credit issuance worker'), with ACs and point estimates."
+        },
+        {
+          "text": "The transcript does NOT rename PRD sections (goals, user stories, success metrics) as tasks.",
+          "passed": false,
+          "evidence": "Epic goals mirror PRD sections directly (E6 'Marketing can see code \u2192 installs \u2192 activations daily' echoes PRD success metrics; E5 'Make the farm 1000 fake accounts attack uneconomical' restates PRD's fraud concern as an epic)."
+        },
+        {
+          "text": "The transcript does NOT produce a 'rough starting breakdown' or 'placeholder tickets' or 'starter set' inline.",
+          "passed": false,
+          "evidence": "The transcript explicitly produces a 'Recommended first sprint' starter set ('E1-1, E1-2, E1-3, E1-4, E2-1, E3-1, E6-1') and a full inline epics-and-stories breakdown with flagged assumptions."
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 0.979,
+        "stddev": 0.0288,
+        "min": 0.9474,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 118.68,
+        "stddev": 112.0581,
+        "min": 29.3,
+        "max": 255.2
+      },
+      "tokens": {
+        "mean": 40772.4,
+        "stddev": 9203.5111,
+        "min": 32423,
+        "max": 52112
+      }
+    },
+    "without_skill": {
+      "pass_rate": {
+        "mean": 0.3211,
+        "stddev": 0.2991,
+        "min": 0.0,
+        "max": 0.6316
+      },
+      "time_seconds": {
+        "mean": 130.06,
+        "stddev": 44.9553,
+        "min": 70.8,
+        "max": 171.7
+      },
+      "tokens": {
+        "mean": 27439.8,
+        "stddev": 5095.032,
+        "min": 21925,
+        "max": 32848
+      }
+    },
+    "delta": {
+      "pass_rate": "+0.66",
+      "time_seconds": "-11.4",
+      "tokens": "+13333"
+    }
+  },
+  "notes": []
+}

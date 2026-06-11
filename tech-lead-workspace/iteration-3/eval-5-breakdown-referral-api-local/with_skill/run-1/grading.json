@@ -1,0 +1,105 @@
+{
+  "expectations": [
+    {
+      "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.",
+      "passed": true,
+      "evidence": "outputs/tasks-referral-api/ exists containing the 5 task files plus README.md."
+    },
+    {
+      "text": "The tasks directory contains a README.md index file.",
+      "passed": true,
+      "evidence": "tasks-referral-api/README.md is present with the breakdown index, dependency graph, and open-question section."
+    },
+    {
+      "text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).",
+      "passed": true,
+      "evidence": "tasks-referral-api/ contains exactly 6 files: README.md + 5 task files (01\u201305), within the 5\u201313 range."
+    },
+    {
+      "text": "Task count is at least 4 (excluding README).",
+      "passed": true,
+      "evidence": "5 task files (01\u201305) excluding README, above the floor of 4."
+    },
+    {
+      "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).",
+      "passed": true,
+      "evidence": "Files are 01-issuance-redemption-walking-skeleton.md, 02-credit-ledger-failure-mode-hardening.md, 03-support-read-endpoint.md, 04-observability-and-alerting.md, 05-rollout-and-load-verification.md \u2014 sequential and in dependency order matching the README graph."
+    },
+    {
+      "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.",
+      "passed": true,
+      "evidence": "Each of the 5 task files has exactly the six fields: a heading title, **One-liner**, **Composes**, **TDD sections addressed**, **Depends on**, **Acceptance criteria** \u2014 no extra fields like Estimate/Out of scope/Notes."
+    },
+    {
+      "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.",
+      "passed": true,
+      "evidence": "All 5 task bodies are prose only \u2014 no fenced code blocks, no function signatures, no shell commands. Field names like referral_codes and referrals_api_enabled appear inline as identifiers but no code blocks."
+    },
+    {
+      "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).",
+      "passed": true,
+      "evidence": "No .py/.go/.js paths or src/ references in any task. Tasks reference TDD sections (\u00a74.2, \u00a77.1) and config-flag/identifier names only."
+    },
+    {
+      "text": "No task is a standalone 'address NFRs' / 'add observability' / 'address scalability' line item \u2014 NFRs ride with feature tasks in their acceptance criteria.",
+      "passed": false,
+      "evidence": "Task 04 is titled 'Observability, alerting, and runbook entries for the referrals surface' \u2014 a standalone observability task. The skill allows one justified cross-cutting observability task; the file does justify it as service-wide per \u00a79, so this is borderline, but it is in form a standalone observability task. Marking fail per the strict guideline that 'address observability' as a standalone item fails."
+    },
+    {
+      "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.",
+      "passed": true,
+      "evidence": "None of the 5 tasks are testing-as-primary-deliverable. Testing rides inside acceptance criteria (e.g. load test verification in task 05 is a rollout-verification task, not 'write tests')."
+    },
+    {
+      "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.",
+      "passed": true,
+      "evidence": "Task 01 is explicitly the walking skeleton with end-to-end shippable behavior (issue + redeem behind a flag). No scaffold-only task exists."
+    },
+    {
+      "text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.",
+      "passed": true,
+      "evidence": "README has 'Open questions blocking work' section calling out both \u00a710.1 and \u00a710.2; \u00a710.2 is explicitly flagged as blocking an unwritten sixth task and as a hard gate before the 10% ramp step. No task is 'decide fraud policy'."
+    },
+    {
+      "text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.",
+      "passed": true,
+      "evidence": "01-issuance-redemption-walking-skeleton.md ships schema + both write endpoints + idempotency + code generation + credit-ledger transactional call (happy path) + 409-on-conflict, behind a launch flag \u2014 textbook vertical slice."
+    },
+    {
+      "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).",
+      "passed": true,
+      "evidence": "Task 01 acceptance criteria explicitly cover Idempotency-Key replay behavior and 409 Conflict on concurrent redemption against the (code) unique constraint; task 02 hardens the credit-ledger failure modes including idempotency-key replay on ambiguous failures."
+    },
+    {
+      "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.",
+      "passed": true,
+      "evidence": "Task 02 ('Harden credit-ledger client for outage and slow-call failure modes') has dedicated acceptance criteria for ledger outage rollback, slow-call timeouts, ambiguous-failure resolution via idempotency-key replay, and verification that no server-side retry happens."
+    },
+    {
+      "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).",
+      "passed": true,
+      "evidence": "Tasks 02, 03, 04, 05 all declare 'Depends on' with concrete task names referencing earlier tasks (e.g. task 04 depends on 01, 02, 03). Only task 01 is 'none', which is correct for the foundation."
+    },
+    {
+      "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).",
+      "passed": true,
+      "evidence": "After task 01, tasks 02 (ledger hardening) and 03 (support read endpoint) both depend only on 01 and are independently startable \u2014 explicit fan-out shape confirmed by the README graph."
+    },
+    {
+      "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').",
+      "passed": true,
+      "evidence": "transcript.md opens with 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`. Covers the three-endpoint synchronous referrals service\u2026' and lists the major sections covered."
+    },
+    {
+      "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.",
+      "passed": true,
+      "evidence": "transcript.md states 'Wrote the breakdown to `./tasks-referral-api/` \u2014 5 tasks + a README index' and surfaces \u00a710.2 as a blocker for a sixth task and a hard gate before the 10% rollout step, plus \u00a710.1 as deferred."
+    }
+  ],
+  "summary": {
+    "passed": 18,
+    "failed": 1,
+    "total": 19,
+    "pass_rate": 0.9474
+  }
+}

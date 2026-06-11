@@ -1,0 +1,26 @@
+{
+  "eval_id": 5,
+  "eval_name": "breakdown-referral-api-local",
+  "prompt": "ok the referrals TDD is done — file is at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md. break it down into actual tasks so the team can pick them up next week. write them locally in this directory, i don't have jira set up for this project yet.",
+  "assertions": [
+    {"id": "fs-tasks-dir-exists", "text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory."},
+    {"id": "fs-readme-present", "text": "The tasks directory contains a README.md index file."},
+    {"id": "fs-file-count-cap", "text": "Total files inside tasks-*/ is between 5 and 13 (≤ 12 tasks + 1 README)."},
+    {"id": "fs-task-count-floor", "text": "Task count is at least 4 (excluding README)."},
+    {"id": "fs-numbered-task-files", "text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order)."},
+    {"id": "schema-task-fields", "text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria — no extra fields."},
+    {"id": "no-code-in-task-bodies", "text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body."},
+    {"id": "no-specific-file-paths", "text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths)."},
+    {"id": "nfrs-ride-with-features", "text": "NFRs ride with feature tasks in their acceptance criteria. A standalone cross-cutting task is allowed ONLY when ALL its bullets cover service-wide concerns no single feature owns (e.g. service-wide saturation alarm, runbooks spanning multiple §7 failure modes, alert-config deploys that fan out across endpoints). If any bullet of a cross-cutting task could ride with a specific feature task, the task fails this assertion — that is a punt, not legitimate cross-cutting."},
+    {"id": "no-tests-as-task", "text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task."},
+    {"id": "no-scaffolding-task", "text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior."},
+    {"id": "open-questions-as-blockers", "text": "The README or chat summary surfaces the TDD's open questions (fraud policy §10.1 and/or expiry boundary §10.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable."},
+    {"id": "first-task-is-vertical-slice", "text": "The first task in dependency order is a vertical slice / walking skeleton — an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'."},
+    {"id": "risk-front-loaded-idempotency", "text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption — the load-bearing risk identified in the TDD (§4.4, §7)."},
+    {"id": "credit-ledger-external-dep-handled", "text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface."},
+    {"id": "dependencies-declared", "text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task)."},
+    {"id": "task-graph-fan-out", "text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape)."},
+    {"id": "tdd-acknowledgement", "text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...')."},
+    {"id": "summary-mentions-destination-and-count", "text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers."}
+  ]
+}

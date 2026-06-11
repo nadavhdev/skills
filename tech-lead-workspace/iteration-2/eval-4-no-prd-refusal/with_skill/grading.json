@@ -1,0 +1,50 @@
+{
+  "expectations": [
+    {
+      "text": "No TDD-*.md file is created in the outputs/ directory",
+      "passed": true,
+      "evidence": "Directory listing shows only response.md present; no TDD-*.md file exists in outputs/."
+    },
+    {
+      "text": "The assistant's final response explicitly states it will not / cannot draft a TDD without a PRD",
+      "passed": true,
+      "evidence": "Opening sentence: 'I won't draft a TDD without a PRD'."
+    },
+    {
+      "text": "The refusal explains the reason — that designing without a PRD would mean inventing the requirements, or equivalent reasoning",
+      "passed": true,
+      "evidence": "'designing without one would mean me inventing the requirements rather than designing for them, and the result wouldn't be principal-level.'"
+    },
+    {
+      "text": "The refusal offers concrete fallback options (paste the PRD, give a file path, give a URL, or help write the PRD)",
+      "passed": true,
+      "evidence": "'Please paste the PRD here, give me a file path or URL I can fetch, or let me know if you'd like help writing the PRD first.' and again at the end: 'If you can paste the PRD, drop a file path, or share a Drive/Confluence link... If there isn't a PRD yet, I'm happy to help you write one first'."
+    },
+    {
+      "text": "The response does not contain a drafted TDD inline (no section headers like '## Problem', '## Detailed design', '## NFRs', no skeleton filled in)",
+      "passed": true,
+      "evidence": "Response contains no TDD section headers (no '## Problem', '## Detailed design', '## NFRs'); only contains explanatory prose and a bulleted list of gaps in what was shared."
+    },
+    {
+      "text": "The response does NOT 'fill in reasonable defaults', 'start from what was shared', or batch-ask triage questions and then proceed to draft",
+      "passed": true,
+      "evidence": "Response explicitly refuses to design and instead lists what a real PRD would need to state ('A real PRD would scope which one(s) are in this release', 'I'd need send rates...', 'The PRD also needs to state...'). No defaults are filled in and no drafting is proceeding."
+    },
+    {
+      "text": "Does not classify the workload type or pick a category reference before having a PRD in hand",
+      "passed": true,
+      "evidence": "While the response notes the two features are 'materially different workloads (transactional, event-driven, per-user vs. bulk, scheduled, campaign-shaped)', this is used as a reason the PRD must scope them, not as a classification picking a category reference for designing. No template/category is selected."
+    },
+    {
+      "text": "The refusal is a single, clear, direct message — not a several-paragraph essay or hedge",
+      "passed": true,
+      "evidence": "Response opens with a single direct refusal sentence, followed by a brief justification list and a closing offer. It is concise (under ~250 words) and does not hedge — it clearly says 'I won't draft a TDD without a PRD'."
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8,
+    "pass_rate": 1.0
+  }
+}

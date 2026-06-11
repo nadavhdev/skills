@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory, ticket list, or task files were created in outputs/. The only file present is transcript.md.",
+      "passed": false,
+      "evidence": "Only transcript.md exists on disk, but the transcript itself IS a full Jira ticket breakdown (7 epics, ~22 stories with ACs and estimates) inline \u2014 which violates the spirit of the assertion: the deliverable was produced even if it landed in transcript.md."
+    },
+    {
+      "text": "The transcript explicitly REFUSES to treat the PRD as a TDD and to break it down.",
+      "passed": false,
+      "evidence": "There is no refusal. The transcript opens with 'Referral Code API \u2014 Jira Ticket Breakdown' and proceeds to decompose the PRD; it only notes 'this PRD didn't go through a TDD' as a caveat while proceeding anyway."
+    },
+    {
+      "text": "The transcript explicitly distinguishes a PRD from a TDD: a PRD states the problem; a TDD states the design. A breakdown decomposes a design, not a problem.",
+      "passed": false,
+      "evidence": "The transcript mentions 'this PRD didn't go through a TDD' and suggests 'a short design doc on attribution + credit issuance would be worth half a day,' but never articulates that a PRD states the problem and a TDD states the design, nor that breakdown decomposes a design."
+    },
+    {
+      "text": "The transcript explicitly offers to author the TDD FIRST via the same skill's TDD-authoring capability, then come back to the breakdown.",
+      "passed": false,
+      "evidence": "The transcript suggests an optional 'short design doc' AFTER already producing the breakdown; it does not offer to author the TDD first via the skill's TDD-authoring capability and come back to the breakdown."
+    },
+    {
+      "text": "The transcript does NOT contain a list of tickets/tasks/epics that came from decomposing the PRD. The PRD was not silently treated as a TDD.",
+      "passed": false,
+      "evidence": "The transcript is a full decomposition: Epics E1\u2013E7 with stories E1-1 through E7-4 (e.g., 'E1-2 \u2014 Code generator with collision retry', 'E4-2 \u2014 Credit issuance worker'), with ACs and point estimates."
+    },
+    {
+      "text": "The transcript does NOT rename PRD sections (goals, user stories, success metrics) as tasks.",
+      "passed": false,
+      "evidence": "Epic goals mirror PRD sections directly (E6 'Marketing can see code \u2192 installs \u2192 activations daily' echoes PRD success metrics; E5 'Make the farm 1000 fake accounts attack uneconomical' restates PRD's fraud concern as an epic)."
+    },
+    {
+      "text": "The transcript does NOT produce a 'rough starting breakdown' or 'placeholder tickets' or 'starter set' inline.",
+      "passed": false,
+      "evidence": "The transcript explicitly produces a 'Recommended first sprint' starter set ('E1-1, E1-2, E1-3, E1-4, E2-1, E3-1, E6-1') and a full inline epics-and-stories breakdown with flagged assumptions."
+    }
+  ],
+  "summary": {
+    "passed": 0,
+    "failed": 7,
+    "total": 7,
+    "pass_rate": 0.0
+  }
+}

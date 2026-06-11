@@ -1,0 +1,75 @@
+{
+  "skill_name": "tech-lead",
+  "evals": [
+    {
+      "id": 0,
+      "name": "referral-api-tdd",
+      "prompt": "hey can you do a TDD for the referral code feature, PRD is at /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md - we need to get this out the door fast for the q3 launch and i want a solid principal-level design doc i can take into review with the staff engineers tomorrow. write the TDD as a file in the current directory.",
+      "expected_output": "Produces a TDD-*.md in current working directory classified as API serving. Covers: API surface (codes endpoint, redemption endpoint, dashboards probably via separate read path), AuthN/Z (user-scoped tokens for mobile clients), data model (codes table with FK to users, redemption events with idempotency, credit ledger integration), latency budget, attribution edge cases. Pushes back / lists open questions on: fraud / self-referral / multi-account abuse, code expiry policy, what 'activation' means precisely, what happens if Stripe credit posting fails, idempotency on the redemption call, code collision strategy. Lists alternatives considered (e.g. deterministic vs random codes, embedded deep-link payload vs server-side lookup). Does not hallucinate a Google Drive PRD when given a file path.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md"]
+    },
+    {
+      "id": 1,
+      "name": "order-events-consumer-tdd",
+      "prompt": "Need a tech design for the order projections service. PRD: /Users/nhoze/.claude/skills/tech-lead/evals/prd-order-events-consumer.md. The team is leaning toward DynamoDB for the store but i'd like a real principal-level take on storage AND on the consumer guarantees (we keep getting bitten by out-of-order events). Write it as a markdown file in this dir.",
+      "expected_output": "Produces a TDD-*.md classified as event-driven/streaming consumer. Covers: delivery semantics (at-least-once from Pub/Sub-mirrored Kafka + idempotent projection writes => effectively-once), per-partition ordering and partition key=order_id implications, offset commit strategy, DLQ for bad transitions, consumer lag SLO. On storage: gives an actual opinion between DynamoDB / Postgres / Redis with tradeoffs (write patterns, secondary indexes if needed, cost at 50K orders/day, replay performance). Handles back-fill / replay design explicitly. Out-of-order handling within a partition addressed (event versioning / sequence numbers / last-writer-wins by event timestamp). Schema evolution under Avro BACKWARDS compatibility addressed. Reasonable open questions list but does not punt the core decisions.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-order-events-consumer.md"]
+    },
+    {
+      "id": 2,
+      "name": "vendor-inventory-sync-tdd",
+      "prompt": "I want a TDD for the vendor inventory sync project. The PRD is at /Users/nhoze/.claude/skills/tech-lead/evals/prd-vendor-inventory-sync.md. Note the weird situation - 12 vendors, 3 different ingestion mechanisms, one of them is literally an emailed CSV. I need the design to honestly handle that mess, not pretend everything is a clean REST API. write to current dir.",
+      "expected_output": "Produces a TDD-*.md primarily classified as scheduled pull-based processing, with explicit acknowledgement of the mixed-source reality (REST polling, SFTP polling, email parsing). Likely proposes a per-vendor connector / adapter pattern. Covers: per-vendor cadence and rate-limit awareness (esp. Vendor F at 60 req/hr), watermark/cursor model per vendor where applicable, locking/no-overlap, freshness SLO + alert on stale data per vendor, dedup of identical inventory updates, malformed-input handling per source type, secret storage and rotation for vendor credentials, audit log design. Pushes back on the email vendor (suggesting at least a dedicated mailbox + parser with quarantine), addresses the shadow-mode rollout explicitly, lists open questions including the storefront discontinued-SKU event mechanism. Does not silently pretend all 12 vendors are uniform.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-vendor-inventory-sync.md"]
+    },
+    {
+      "id": 3,
+      "name": "logsql-cli-tdd",
+      "prompt": "Write me a TDD for the logsql CLI tool, PRD at /Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md. I want the design to take a real stance on the things engineers will fight about (Go vs Python, parser strictness, schema-on-read vs config) instead of punting all of them. Output as a .md file in the current dir.",
+      "expected_output": "Produces a TDD-*.md classified as CLI utility. Covers: command surface with --help sketch, exit codes (incl. a possible specific code for 'no rows matched' as a deliberate design choice), STDIN/pipe behavior, streaming vs whole-load decision (explicit: streaming for the common case, named in-memory limits for GROUP BY / ORDER BY), output formats and how they're selected, error reporting (per-record errors vs fatal), memory budget for aggregations, performance budget vs the 5s/1GB target. Takes an actual position on Go vs Python (likely Go for the static-binary requirement) with stated tradeoffs. Takes a position on parser strictness with reasoning. Lists alternatives considered including 'use jq/duckdb instead' and rejects honestly. Does not waste sections on availability SLOs, multi-region, DR for a CLI - explicitly notes those NFRs are not applicable.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md"]
+    },
+    {
+      "id": 4,
+      "name": "no-prd-refusal",
+      "prompt": "hey can you write a TDD for the new notifications service we're building? we want users to get push notifications when their order ships, and emails for promo campaigns. should support around 100k users, with potential to grow to 1M. save it as a markdown file in the current dir please, i need it for tomorrow's review.",
+      "expected_output": "Skill REFUSES to draft a TDD because no PRD was provided. No TDD-*.md file is produced. The assistant's response (a) explicitly states it will not draft without a PRD, (b) explains briefly why (would mean inventing requirements), and (c) offers concrete fallback options (paste the PRD, give a file path, give a URL, or help write the PRD). Does NOT produce a draft TDD inline. Does NOT 'fill in reasonable defaults' or 'start from what was shared'. Does NOT just batch-ask triage questions and then proceed.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "breakdown-referral-api-local",
+      "prompt": "ok the referrals TDD is done — file is at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md. break it down into actual tasks so the team can pick them up next week. write them locally in this directory, i don't have jira set up for this project yet.",
+      "expected_output": "Skill invokes the TDD-to-task-breakdown capability. ACKNOWLEDGES reading the TDD with a one-line summary. Asks NO destination question because user already said local. Creates ./tasks-referral-api/ (or similar slug) containing between 6 and 12 task markdown files named NN-<slug>.md plus a README.md index — total file count ≤ 13. The README lists tasks in dependency order and includes a dependency graph and lists the open questions (fraud policy §10.1, expiry boundary §10.2) as BLOCKERS for tasks that touch them (not as tasks themselves). The first task in dependency order is a vertical slice / walking skeleton — an end-to-end redemption happy path with idempotency baked in, NOT a 'set up the package' or 'create the schema' scaffolding task. Risk-front-loaded around idempotency / concurrent redemption (the design's load-bearing operation). NFRs ride with feature tasks in acceptance criteria — there is NO standalone 'address NFRs' / 'write tests' task. A cross-cutting task IS allowed only when ALL its bullets cover service-wide concerns no single feature owns (e.g. service-wide saturation alarm, runbooks spanning multiple §7 failure modes); if any bullet could ride with a specific feature task, that's a punt and the task should be split. Each task has Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria — and ONLY these fields. Task bodies contain NO code, NO function signatures, NO specific file paths or module names, NO library/framework choices (Postgres-the-DB is OK because the TDD picked it; library versions are not). Acceptance criteria are observable outcomes (HTTP responses, latency targets cited from the TDD, behavior under failure) not implementation steps. Chat summary names destination, task count, and the open-question blockers.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md"]
+    },
+    {
+      "id": 6,
+      "name": "breakdown-order-events-jira-mcp-missing",
+      "prompt": "Got the order projections TDD finalized — /Users/nhoze/.claude/skills/tech-lead/evals/tdd-order-events-consumer.md. Please create the tickets in Jira for the team.",
+      "expected_output": "Skill invokes the TDD-to-task-breakdown capability. Acknowledges reading the TDD. Recognizes user picked Jira at the destination gate. DETECTS whether a Jira/Atlassian MCP is available in the session; assuming none is configured (test env), OFFERS THREE BRANCHES — (1) walk through installing a Jira MCP interactively, (2) skip MCP and produce paste-ready blocks now, (3) switch to local directory — and waits for the user to choose. Does NOT silently default to one branch. Does NOT pretend Jira access it doesn't have. Does NOT proceed to write tickets / blocks without the user picking a branch. If the model proceeds because it assumes the user wants paste-ready, that's a fail; it must ask. (For grading: only the gate behavior is checked in this eval; if the model correctly stops at the gate and asks, the eval passes regardless of what the tasks would look like.)",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-order-events-consumer.md"]
+    },
+    {
+      "id": 7,
+      "name": "breakdown-logsql-cli-local",
+      "prompt": "Tasks please for the logsql CLI tool. TDD is at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md. Write them as a local directory, that's what the team uses for personal projects.",
+      "expected_output": "Skill invokes the TDD-to-task-breakdown capability. Acknowledges the TDD. Creates ./tasks-logsql-cli/ (or similar slug) with between 5 and 10 tasks plus README. The first task is a walking skeleton — a minimal end-to-end CLI that reads JSON-lines from STDIN and emits CSV for the simplest SELECT * WHERE LIMIT case — NOT 'implement the parser' followed by 'implement the executor' followed by 'implement the output formatter' (that's horizontal layering and is wrong). Tasks DO NOT re-litigate decisions the TDD already made (Go-vs-Python is decided; parser strictness is decided; tasks must not include 'decide on language' or 'choose parser strategy'). Tasks DO NOT include 'write tests' as a standalone task. Tasks DO NOT include 'set up the package skeleton' as a standalone task — scaffolding is folded into the walking skeleton. NFRs ride in acceptance criteria of the relevant feature tasks: cold-start latency is owned by the walking skeleton, throughput is owned by the operator-pipeline task, memory-budget is owned by the GROUP BY and ORDER BY tasks. There is NO standalone 'performance benchmarks' / 'CI benchmarks' task — those NFRs each have a clear feature owner and pulling them out is a punt. The exit-code convention (including the deliberate exit 1 for zero-rows-matched) is captured in acceptance criteria of whatever task introduces it. Open question §10.1 (exact SQL subset) surfaces as a blocker if it would constrain any specific task. Task bodies contain NO code, NO function signatures, NO file paths like 'cmd/logsql/main.go'. Chat summary names destination, task count, and any open-question blockers.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md"]
+    },
+    {
+      "id": 8,
+      "name": "no-tdd-refusal",
+      "prompt": "hey can you break down the notifications service feature into tasks for the team? we want users to get push notifications when their order ships, and emails for promo campaigns. let's split it into tickets so we can start sprinting. write them locally somewhere reasonable.",
+      "expected_output": "Skill REFUSES to break down without a TDD. No ./tasks-* directory is created. No tickets are drafted. The assistant's response (a) explicitly states it will not break down without a TDD, (b) explains briefly why (would mean producing opinions about a feature, not decomposition of an agreed design), (c) offers concrete fallback options (paste the TDD, give a file path or URL), and (d) notes that if the user only has a PRD, the TDD-authoring capability of the same skill can author the TDD first. Does NOT batch-ask triage questions and then proceed. Does NOT produce a 'starting set of tasks based on what was shared'. Does NOT silently default to writing a local directory.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "name": "breakdown-prd-not-tdd-routed-to-authoring",
+      "prompt": "I have the PRD for the referral feature ready at /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md. Can you break it down into Jira tickets so the team can start work?",
+      "expected_output": "Skill REFUSES to treat the PRD as a TDD. No tasks/tickets are drafted. The assistant's response (a) explicitly distinguishes PRD from TDD (a PRD is a problem statement, a TDD is the agreed design), (b) explains that breaking down a PRD would produce opinions about a feature rather than a decomposition of an agreed design, and (c) offers to author the TDD FIRST via the TDD-authoring capability of the same skill, then come back to the breakdown. Does NOT silently treat the PRD as a TDD and start decomposing. Does NOT just rename PRD sections as tasks. Does NOT produce a 'rough starting breakdown' inline.",
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md"]
+    }
+  ]
+}

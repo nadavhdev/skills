@@ -1,0 +1,14 @@
+{
+  "eval_id": 9,
+  "eval_name": "breakdown-prd-not-tdd-routed-to-authoring",
+  "prompt": "I have the PRD for the referral feature ready at /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md. Can you break it down into Jira tickets so the team can start work?",
+  "assertions": [
+    {"id": "no-task-files-written", "text": "No task directory, ticket list, or task files were created in outputs/. The only file present is transcript.md."},
+    {"id": "explicit-refusal", "text": "The transcript explicitly REFUSES to treat the PRD as a TDD and to break it down."},
+    {"id": "distinguishes-prd-from-tdd", "text": "The transcript explicitly distinguishes a PRD from a TDD: a PRD states the problem; a TDD states the design. A breakdown decomposes a design, not a problem."},
+    {"id": "offers-tdd-authoring-routing", "text": "The transcript explicitly offers to author the TDD FIRST via the same skill's TDD-authoring capability, then come back to the breakdown."},
+    {"id": "no-prd-decomposed-as-tasks", "text": "The transcript does NOT contain a list of tickets/tasks/epics that came from decomposing the PRD. The PRD was not silently treated as a TDD."},
+    {"id": "no-prd-sections-renamed-as-tasks", "text": "The transcript does NOT rename PRD sections (goals, user stories, success metrics) as tasks."},
+    {"id": "no-rough-starting-breakdown", "text": "The transcript does NOT produce a 'rough starting breakdown' or 'placeholder tickets' or 'starter set' inline."}
+  ]
+}

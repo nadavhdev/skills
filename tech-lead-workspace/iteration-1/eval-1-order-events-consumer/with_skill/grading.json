@@ -1,0 +1,130 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-order-projections.md exists in outputs/ directory"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Document is approximately 4500+ words spanning 10 substantial sections"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem & context' describes polling waste, lag, and driver (holiday ramp)"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '2. Scope' has both 'In scope' (Kafka consumer, read API, DLQ, etc.) and 'Out of scope' (order service replacement, cross-order aggregations, etc.)"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '3. High-level approach' describes the Kotlin service on GKE with consumer + read API, includes prose diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '4. Detailed design' has 11 subsections (4a-4k) covering broker model, delivery semantics, offsets, DLQ, concurrency, back-pressure, state, schema evolution, data model, read API, dependencies"
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '5. Alternatives considered' covers Spanner, Postgres, DynamoDB, Redis, Kafka Streams/ksqlDB, scaling order service, and doing nothing — each with verdict"
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section '6. Non-functional requirements' has concrete numbers: read API p99<50ms, end-to-end p95<2s, consumer lag p95<30s, DLQ rate <0.01%"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '7. Risks & failure modes' has 8 risks with likelihood, blast radius, mitigation, recovery columns"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section '8. Rollout & migration' has 4 phases plus rollback and data backfill plans"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section '9. Observability & operations' plus extensive Observability subsection in §6 covering metrics, logs, traces, alerts"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '10. Open questions' has 10 entries with [BLOCKER]/[IMPORTANT]/[NORMAL] severity"
+    },
+    {
+      "text": "No fabricated/invented URLs to internal systems",
+      "passed": true,
+      "evidence": "Uses placeholders like '<link to runbook — to be added>' and only references the PRD path; no invented internal URLs"
+    },
+    {
+      "text": "TDD is structured as an event-driven / streaming consumer design",
+      "passed": true,
+      "evidence": "Header explicitly says 'Workload category: Event-driven / streaming consumer (Kafka)' and design is centered on Kafka consumer group with partition-level workers"
+    },
+    {
+      "text": "Explicitly states delivery semantics (at-least-once + idempotent processing) and what makes effects idempotent",
+      "passed": true,
+      "evidence": "Section 4b states 'At-least-once delivery. Duplicates happen on producer retry...' and defines effectively-once via event_version + conditional CAS write: 'if event.version <= P.applied_version: drop (duplicate)'"
+    },
+    {
+      "text": "Discusses per-partition ordering and partition key choice (order_id) and what that buys",
+      "passed": true,
+      "evidence": "Section 4b: 'Within one partition, messages are strictly ordered... Since partitioning is by order_id, all events for a single order land on one partition and are therefore ordered'"
+    },
+    {
+      "text": "Specifies a consumer lag SLO with a concrete number",
+      "passed": true,
+      "evidence": "'Consumer lag SLO: p95 lag < 30s. p99 < 2min. Alert at p95 > 60s for 5min, page at p95 > 5min'"
+    },
+    {
+      "text": "Specifies a DLQ for bad transitions / poison messages with trigger and replay path",
+      "passed": true,
+      "evidence": "Section 4d has table of DLQ triggers (schema_incompatible, illegal_transition, missing_version, gap_not_closed, apply_failed, store_write_failed), DLQ envelope schema, and replay tool 'ops/replay-order.sh order_id'"
+    },
+    {
+      "text": "Specifies offset commit strategy (after processing / batch / at-least-once semantics)",
+      "passed": true,
+      "evidence": "Section 4c: 'Auto-commit off. Manual commit after successful apply (or after DLQ). Commit cadence: per message... offsets are committed only after the conditional write succeeds'"
+    },
+    {
+      "text": "Takes an actual position on storage (DynamoDB vs Postgres vs Redis) with stated tradeoffs, not punted",
+      "passed": true,
+      "evidence": "Section 5: Explicitly recommends Spanner over DynamoDB ('Not recommended on GCP-only'), Postgres ('Viable second choice'), Redis ('Rejected as primary store'). Section 3 states 'Recommendation: Spanner'"
+    },
+    {
+      "text": "Addresses Avro schema evolution under BACKWARDS compatibility",
+      "passed": true,
+      "evidence": "Section 4h: 'Schema Registry mode: BACKWARDS (already enforced). Adding a new optional field is always safe. Removing a field needs a forward migration... Breaking change → new topic orders.events.v2'"
+    },
+    {
+      "text": "Addresses out-of-order event handling within partition (sequence numbers / event-timestamp last-writer-wins / state-machine guards)",
+      "passed": true,
+      "evidence": "Section 4b defines event_version monotonic per order_id, with gap buffer: 'if event.version > P.applied_version + 1: park event in a per-order pending buffer... do NOT commit Kafka offset for this message yet — wait for the gap to close'"
+    },
+    {
+      "text": "Designs back-fill / full-replay path for initial seed and recovery",
+      "passed": true,
+      "evidence": "Section 8 'Data backfill: before Phase 3, run a one-time full backfill: bump the consumer group offset to earliest, let it grind through all retained history (~15min at 24 partitions in parallel). Conditional-write CAS makes this safe to repeat.' Plus replay tool in §4d"
+    },
+    {
+      "text": "Designs the GET /orders/{id}/projection read endpoint with latency target",
+      "passed": true,
+      "evidence": "Section 4j: 'GET /orders/{order_id}/projection. Single Spanner point read by primary key. p99 < 10ms expected; p99 < 50ms SLO has comfortable headroom.' Response includes applied_version, last_event_time, 404 handling, auth"
+    }
+  ],
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "total": 24,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "TDD-referral-code-api.md exists in outputs/ directory"
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "Word count: 5051 words"
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '1. Problem & context' covers consumer app, MAU, marketing deadline"
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '2. Scope' has explicit 'In scope' and 'Out of scope' subsections"
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '3. High-level approach' covers code lifecycle, redemption attribution, credit issuance with ASCII diagram"
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '4. Detailed design' has 10 subsections (4a-4j) covering API surface, data access, latency, fraud, etc."
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale for each",
+      "passed": true,
+      "evidence": "Section '5. Alternatives considered' lists 6 alternatives each with rejection rationale (own microservice, Stripe Coupons, deterministic hashids, server-side attribution, synchronous credit, vendor)"
+    },
+    {
+      "text": "Contains an NFRs / Non-functional requirements section with concrete targets (numbers/SLOs)",
+      "passed": true,
+      "evidence": "Section '6. Non-functional requirements' includes 99.9% monthly availability, p95 120ms read/200ms write, 500 RPS burst, 4M MAU at 12 months"
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '7. Risks & failure modes' enumerates 9 risks with likelihood, blast radius, mitigation, recovery"
+    },
+    {
+      "text": "Contains a 'Rollout' / 'Migration' section",
+      "passed": true,
+      "evidence": "Section '8. Rollout & migration' has Phase 0-3 timeline, backwards compat, rollback story"
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Section '9. Observability & operations' enumerates pages/tickets/daily, plus Observability NFR subsection with metrics, logs, traces, alerts table"
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '10. Open questions' has 10 entries, 3 marked [BLOCKER]"
+    },
+    {
+      "text": "Contains no fabricated/invented URLs to internal systems (only placeholders or PRD-mentioned references are acceptable)",
+      "passed": true,
+      "evidence": "Only placeholder '<link to referrals runbook — to be added>' and a path reference to the PRD file; no invented company URLs"
+    },
+    {
+      "text": "TDD is structured as an API serving design (mentions endpoints/routes/methods, response shapes, AuthN/Z model)",
+      "passed": true,
+      "evidence": "Section 4a has full endpoint table with Method/Path/Auth/Purpose; section 4b explicitly covers AuthN (JWT) and AuthZ (row-level)"
+    },
+    {
+      "text": "Defines a data model / schema for referral codes and redemption events with primary keys and important indexes",
+      "passed": true,
+      "evidence": "Section 4c includes SQL DDL for referrals.codes, referrals.redemptions, referrals.credit_receipts, referrals.stats with PRIMARY KEY and explicit indexes (redemptions_referrer_idx, redemptions_status_idx)"
+    },
+    {
+      "text": "Explicitly addresses idempotency of the redemption call (idempotency key, dedup table, conditional write, or equivalent)",
+      "passed": true,
+      "evidence": "Redemption idempotent on PK (referee_user_id), INSERT ... ON CONFLICT pattern; credit_receipts table with idempotency_key column 'referral:activate:{redemption_id}:referrer'"
+    },
+    {
+      "text": "Addresses fraud / self-referral / multi-account abuse prevention (referenced as design concern, not punted)",
+      "passed": true,
+      "evidence": "Section 4h 'Fraud guardrails' lists 4 explicit rules: self-network (device/IP/payment match), velocity per referrer, velocity per IP/device, trial-abuse signal"
+    },
+    {
+      "text": "Defines or constrains what 'activation' means (e.g., first paid subscription start) and the credit-issuance trigger flow",
+      "passed": true,
+      "evidence": "Section 4g 'Credit issuance' details consumer for subscription.activated event with 5-step flow: lookup, fraud check, transactional update, ledger call, ack"
+    },
+    {
+      "text": "Addresses code-collision / generation strategy (random + uniqueness check, deterministic from user ID, etc.)",
+      "passed": true,
+      "evidence": "Section 4c: 'secrets.token_bytes mapped to the alphabet and rely on the UNIQUE constraint to detect collisions; on conflict we retry up to 5 times. After 5 retries we widen to 7 chars'"
+    },
+    {
+      "text": "Has a concrete latency budget for the API (numbers, not 'fast')",
+      "passed": true,
+      "evidence": "Section 4d: 'p95 ≤ 120 ms end-to-end for GET /referrals/me, p95 ≤ 200 ms for POST /v1/referrals/redemptions' with per-stage table (TLS 10ms, JWT 3ms, Redis 2ms, Postgres 20ms)"
+    },
+    {
+      "text": "Discusses integration with Stripe and the internal credit ledger, including what happens if the credit write fails",
+      "passed": true,
+      "evidence": "Section 4g step 4-5 and 4i: 'If step 4 fails after step 3 committed: the receipts table records intent; on next event-redelivery (or manual retry via runbook) we re-issue using the same idempotency key'; ledger row in dependency table"
+    }
+  ],
+  "summary": {
+    "passed": 21,
+    "failed": 0,
+    "total": 21,
+    "pass_rate": 1.0
+  }
+}

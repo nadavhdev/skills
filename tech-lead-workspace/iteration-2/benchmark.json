@@ -1,0 +1,133 @@
+{
+  "metadata": {
+    "skill_name": "tech-lead",
+    "skill_path": "/Users/nhoze/.claude/skills/tech-lead",
+    "executor_model": "claude-opus-4-7",
+    "timestamp": "2026-06-09T21:00:00Z",
+    "evals_run": [0, 1, 2, 3, 4],
+    "runs_per_configuration": 1,
+    "comparison_note": "with_skill = new skill (post-edit). without_skill = old skill snapshot (pre-edit). Baseline was only run for eval-4 (the no-PRD refusal test); evals 0-3 are regression checks on the new skill."
+  },
+  "runs": [
+    {
+      "eval_id": 0,
+      "eval_name": "eval-0-referral-api (with_skill)",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 23,
+        "failed": 0,
+        "total": 23,
+        "time_seconds": 353.5,
+        "tokens": 51822,
+        "tool_calls": 8,
+        "errors": 0
+      }
+    },
+    {
+      "eval_id": 1,
+      "eval_name": "eval-1-order-events-consumer (with_skill)",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 26,
+        "failed": 0,
+        "total": 26,
+        "time_seconds": 370.5,
+        "tokens": 51523,
+        "tool_calls": 7,
+        "errors": 0
+      }
+    },
+    {
+      "eval_id": 2,
+      "eval_name": "eval-2-vendor-inventory-sync (with_skill)",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 26,
+        "failed": 0,
+        "total": 26,
+        "time_seconds": 270.3,
+        "tokens": 49269,
+        "tool_calls": 7,
+        "errors": 0
+      }
+    },
+    {
+      "eval_id": 3,
+      "eval_name": "eval-3-logsql-cli (with_skill)",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 24,
+        "failed": 0,
+        "total": 24,
+        "time_seconds": 246.5,
+        "tokens": 46646,
+        "tool_calls": 7,
+        "errors": 0
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4-no-prd-refusal (with_skill — NEW)",
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 29.3,
+        "tokens": 25303,
+        "tool_calls": 2,
+        "errors": 0
+      }
+    },
+    {
+      "eval_id": 4,
+      "eval_name": "eval-4-no-prd-refusal (without_skill — OLD)",
+      "configuration": "without_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 0.5,
+        "passed": 4,
+        "failed": 4,
+        "total": 8,
+        "time_seconds": 143.1,
+        "tokens": 27440,
+        "tool_calls": 4,
+        "errors": 0
+      }
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0},
+      "time_seconds": {"mean": 254.0, "stddev": 136.3, "min": 29.3, "max": 370.5},
+      "tokens": {"mean": 44912.6, "stddev": 11157.0, "min": 25303, "max": 51822}
+    },
+    "without_skill": {
+      "pass_rate": {"mean": 0.5, "stddev": 0.0, "min": 0.5, "max": 0.5},
+      "time_seconds": {"mean": 143.1, "stddev": 0.0, "min": 143.1, "max": 143.1},
+      "tokens": {"mean": 27440, "stddev": 0, "min": 27440, "max": 27440}
+    },
+    "delta": {
+      "pass_rate": "+0.50",
+      "time_seconds": "+110.9",
+      "tokens": "+17472.6"
+    }
+  },
+  "notes": [
+    "with_skill = NEW (post-edit) skill, run on all 5 evals. without_skill = OLD (pre-edit) skill snapshot, run only on eval-4.",
+    "Headline result: on eval-4 (no-PRD refusal), the NEW skill passed 8/8. It refused to draft, used the prescribed refusal language, and offered three fallback options. The OLD skill passed 4/8 — it engaged, classified the workload, and batch-asked triage questions toward drafting.",
+    "Regression check on evals 0–3: all 4 TDDs scored perfect (23/23, 26/26, 26/26, 24/24). The tightened skill did not break TDD-producing prompts; the proof-of-read acknowledgement and the every-NFR-decision-visible rule visibly improved the artifact.",
+    "Delta numbers in the summary table are dominated by eval-4 since it's the only matched pair; treat the pass-rate delta as 'eval-4 refusal: +50% absolute', not a population estimate.",
+    "On eval-4, the NEW skill is also faster and cheaper (29.3s / 25.3k tokens vs 143.1s / 27.4k tokens) — refusing fast is cheaper than triaging slowly toward a draft."
+  ]
+}

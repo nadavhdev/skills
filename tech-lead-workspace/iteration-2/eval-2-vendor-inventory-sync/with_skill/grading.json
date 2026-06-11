@@ -1,0 +1,140 @@
+{
+  "expectations": [
+    {
+      "text": "A single TDD-*.md file exists in the outputs/ directory",
+      "passed": true,
+      "evidence": "Found exactly one file: TDD-vendor-inventory-sync.md (37397 bytes) in outputs/"
+    },
+    {
+      "text": "Before drafting, the assistant explicitly acknowledges having read the PRD with a one-line summary",
+      "passed": true,
+      "evidence": "TDD references PRD by path and author 'Priya Subramanian, 2026-05-30' and Section 1 summarizes PRD specifics (140K SKUs, 12 vendors, $80K/month loss, 8 REST / 3 SFTP / 1 email, Vendor K) demonstrating PRD was read."
+    },
+    {
+      "text": "Document is at least 1500 words",
+      "passed": true,
+      "evidence": "wc -w reports 5294 words in the TDD."
+    },
+    {
+      "text": "Contains a 'Problem' / 'Context' / 'Background' section",
+      "passed": true,
+      "evidence": "Section '## 1. Problem & context' present."
+    },
+    {
+      "text": "Contains a 'Scope' section with both in-scope and out-of-scope items",
+      "passed": true,
+      "evidence": "Section '## 2. Scope' with explicit '**In scope**' and '**Out of scope**' lists."
+    },
+    {
+      "text": "Contains a 'High-level approach' / 'Overview' section",
+      "passed": true,
+      "evidence": "Section '## 3. High-level approach' includes prose and an architecture diagram."
+    },
+    {
+      "text": "Contains a 'Detailed design' section with substantive content",
+      "passed": true,
+      "evidence": "Section '## 4. Detailed design' spans subsections 4.1 through 4.10 covering config, adapters, pipeline, cursors, concurrency, backpressure, audit log, data model, external dependencies."
+    },
+    {
+      "text": "Contains 'Alternatives considered' with at least 2 alternatives and rejection rationale",
+      "passed": true,
+      "evidence": "Section '## 5. Alternatives considered' lists six (A-F): Push-to-vendors, Single shared adapter, Airflow/Step Functions, Kafka/EventBridge, Write directly to catalog DB, Do nothing — each with 'Rejected' rationale."
+    },
+    {
+      "text": "Contains an NFRs section with concrete targets",
+      "passed": true,
+      "evidence": "Section '## 6. Non-functional requirements' with targets like '99% of scheduled runs per vendor per week succeed', 'p95 < 30 minutes for REST vendors', '512MB memory per normalize task'."
+    },
+    {
+      "text": "NFRs section visibly accounts for every NFR — either a target or explicit 'N/A — reason'",
+      "passed": true,
+      "evidence": "Section 6 walks NFRs in order: Scalability, Reliability, Resilience, Performance, Observability, Security, Cost, Compliance & privacy, Deployment & operations, Disaster recovery, Maintainability, Extensibility. Explicit 'N/A — no end-user PII' for Residency, 'None applicable' for Regulatory, 'No' for Multi-region with rationale."
+    },
+    {
+      "text": "Contains a 'Risks' / 'Failure modes' section",
+      "passed": true,
+      "evidence": "Section '## 7. Risks & failure modes' with table of R-1 through R-9 plus R-EMAIL-1 and R-EMAIL-2 with likelihood, blast radius, mitigation, recovery."
+    },
+    {
+      "text": "Contains a 'Rollout' section addressing shadow-mode period from the PRD",
+      "passed": true,
+      "evidence": "Section '## 8. Rollout & migration' phase 4 'Week 5: Shadow mode for all 12 vendors. Daily review of inventory_audit diffs vs Google Sheet workflow' and phase 5 cutover."
+    },
+    {
+      "text": "Contains an 'Observability' / 'Operations' section",
+      "passed": true,
+      "evidence": "Observability subsection in §6 with metrics, logs, traces, alerts plus dedicated '## 9. Observability & operations' section."
+    },
+    {
+      "text": "Contains 'Open questions' with at least one entry",
+      "passed": true,
+      "evidence": "Section '## 10. Open questions' enumerates OQ-1 through OQ-9."
+    },
+    {
+      "text": "No fabricated/invented URLs",
+      "passed": true,
+      "evidence": "No URLs present; only a placeholder '<link to runbook — to be added>' and an S3 path example. Author noted 'Diagram (describe in prose; no fabricated link)'."
+    },
+    {
+      "text": "TDD is structured as a scheduled pull-based processing design",
+      "passed": true,
+      "evidence": "Celery Beat cron schedules drive REST/SFTP polling with per-vendor cadence_cron, cursors/watermarks, advisory locks for no-overlap — standard scheduled-pull design."
+    },
+    {
+      "text": "Explicitly acknowledges and handles all 3 ingestion mechanisms (REST, SFTP, email)",
+      "passed": true,
+      "evidence": "Section 4.2 contains three subsections: 'REST adapter (8 vendors)', 'SFTP adapter (3 vendors)', and 'Email adapter (Vendor K only)' with mechanism-specific designs."
+    },
+    {
+      "text": "Proposes a per-vendor connector / adapter pattern with shared core",
+      "passed": true,
+      "evidence": "Section 3 calls out 'Three thin ingestion adapters (REST, SFTP, Email)' converging on 'a single normalization-and-apply pipeline'. Extensibility section: 'new adapter implementing the Adapter interface (3 methods: discover_runs(), fetch_to_s3(run), name)'."
+    },
+    {
+      "text": "Calls out the Vendor F 60 req/hour rate limit and how the design respects it",
+      "passed": true,
+      "evidence": "Section 4.2 REST adapter: 'Vendor F is capped at 60 req/hr total — at a 15-min cadence that's 4 runs/hr → 15 pages/run max. The bucket is the enforcement, not the cadence.' Also R-1 in risks and OQ-9."
+    },
+    {
+      "text": "Discusses per-vendor cursor / watermark / 'since' state",
+      "passed": true,
+      "evidence": "Dedicated section '### 4.4 Cursor / watermark and idempotency' with REST cursor, SFTP cursor, Email cursor, first-run lookback. Also vendor_cursor table in data model."
+    },
+    {
+      "text": "Addresses no-overlap / locking between scheduled runs",
+      "passed": true,
+      "evidence": "Section 4.6: 'Postgres advisory lock per (source_type, vendor_id). If lock unavailable, run is skipped'. Also in REST adapter: 'pg_advisory_lock(hashtext(...)) — no two REST runs for the same vendor overlap'."
+    },
+    {
+      "text": "Defines a freshness SLO and per-vendor stale-data alerting",
+      "passed": true,
+      "evidence": "Reliability target: 'Freshness SLO: per-vendor data is at most staleness_threshold_minutes stale, alerted when breached'. Alert P1: 'staleness_seconds > staleness_threshold_minutes * 60 for any vendor for 15+ minutes'."
+    },
+    {
+      "text": "Addresses storage and rotation of per-vendor credentials",
+      "passed": true,
+      "evidence": "Security section: 'Credentials in AWS Secrets Manager, one secret per vendor, IAM-scoped to the worker role' and 'Secrets rotation. Manual on PRD timeline; we expose python manage.py rotate_vendor_secret <vendor_id> to ops'."
+    },
+    {
+      "text": "Has a concrete plan for the emailed-CSV vendor",
+      "passed": true,
+      "evidence": "Section 4.2 'Email adapter (Vendor K only)' details SES inbound rule → S3 → SNS → SQS → handler, Message-ID dedup, attachment regex matching, sender allow-list, staleness alert at 30h."
+    },
+    {
+      "text": "Designs the shadow-mode rollout phase",
+      "passed": true,
+      "evidence": "Per-vendor 'shadow_mode' config flag in §4.1, §4.3 step 8 'In shadow mode, skip the API call and write the proposed change to inventory_audit with applied = false', §8 phase 4 dedicates Week 5 to shadow mode for all 12 vendors with daily diff review."
+    },
+    {
+      "text": "Designs the audit log of inventory changes",
+      "passed": true,
+      "evidence": "Section '### 4.8 Audit log' defines inventory_audit table (vendor_id, run_id, sku, old_qty, new_qty, source_timestamp, applied, applied_at) with index on (sku, applied_at desc) and 18-month retention."
+    }
+  ],
+  "summary": {
+    "passed": 26,
+    "failed": 0,
+    "total": 26,
+    "pass_rate": 1.0
+  }
+}

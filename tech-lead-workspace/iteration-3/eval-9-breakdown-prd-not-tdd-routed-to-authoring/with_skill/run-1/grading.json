@@ -1,0 +1,45 @@
+{
+  "expectations": [
+    {
+      "text": "No task directory, ticket list, or task files were created in outputs/. The only file present is transcript.md.",
+      "passed": true,
+      "evidence": "Filesystem listing of with_skill/outputs/ shows only transcript.md (2283 bytes); no tasks-*/ directory or ticket files were created."
+    },
+    {
+      "text": "The transcript explicitly REFUSES to treat the PRD as a TDD and to break it down.",
+      "passed": true,
+      "evidence": "Opens with 'I won't break this down without a TDD \u2014 without one, the tasks would be my opinions about a feature, not a decomposition of a design the team has agreed on...' \u2014 an explicit refusal."
+    },
+    {
+      "text": "The transcript explicitly distinguishes a PRD from a TDD: a PRD states the problem; a TDD states the design. A breakdown decomposes a design, not a problem.",
+      "passed": true,
+      "evidence": "'it is a PRD: it states the problem, the goals, user stories, and constraints, but it does not state the design. A task breakdown decomposes a *design*, and there isn't one here yet.'"
+    },
+    {
+      "text": "The transcript explicitly offers to author the TDD FIRST via the same skill's TDD-authoring capability, then come back to the breakdown.",
+      "passed": true,
+      "evidence": "Option 1: 'I author the TDD first. I'll use the TDD-authoring capability of this same skill, working from this PRD... Once it's approved, I'll come back and break it into Jira tickets.'"
+    },
+    {
+      "text": "The transcript does NOT contain a list of tickets/tasks/epics that came from decomposing the PRD. The PRD was not silently treated as a TDD.",
+      "passed": true,
+      "evidence": "The transcript contains no epics, stories, or tickets \u2014 only a list of design decisions the TDD would need to settle, framed as gaps not as work items."
+    },
+    {
+      "text": "The transcript does NOT rename PRD sections (goals, user stories, success metrics) as tasks.",
+      "passed": true,
+      "evidence": "No PRD section appears as a task; the bulleted items are explicitly framed as 'design call[s], not a ticket'."
+    },
+    {
+      "text": "The transcript does NOT produce a 'rough starting breakdown' or 'placeholder tickets' or 'starter set' inline.",
+      "passed": true,
+      "evidence": "No inline starter tickets are produced; instead the response presents two options (author TDD first, or paste an existing TDD) and asks which to proceed with."
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7,
+    "pass_rate": 1.0
+  }
+}

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "tech-lead iter-4", "runs": [{"id": "eval-5-breakdown-referral-api-local-with_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [], "grading": {"expectations": [{"text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.", "passed": true, "evidence": "Directory tasks-referrals-api/ exists inside outputs/."}, {"text": "The tasks directory contains a README.md index file.", "passed": true, "evidence": "README.md is present in tasks-referrals-api/ alongside the five task files."}, {"text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).", "passed": true, "evidence": "Six files total: 5 task files (01-05) plus README.md."}, {"text": "Task count is at least 4 (excluding README).", "passed": true, "evidence": "Five numbered task files: 01-walking-skeleton-issuance, 02-idempotent-redemption, 03-support-lookup-endpoint, 04-observability-and-runbook, 05-staged-rollout."}, {"text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).", "passed": true, "evidence": "All files are 01-..., 02-..., 03-..., 04-..., 05-... with sequential numbering matching the dependency order in README."}, {"text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.", "passed": true, "evidence": "Each of the five task files has a heading title plus exactly the six fields (One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria); no extra fields like Effort or Owner."}, {"text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.", "passed": true, "evidence": "Task bodies contain prose with backtick identifiers like `POST /codes`, table names, and metric names \u2014 no fenced code blocks, function signatures, or shell commands."}, {"text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).", "passed": true, "evidence": "Tasks reference logical entities (referrals-api service, referral_codes/referral_redemptions tables, credit-ledger-api) but no source file paths with .py/.go/.js extensions."}, {"text": "NFRs ride with feature tasks in their acceptance criteria. A standalone cross-cutting task is allowed ONLY when ALL its bullets cover service-wide concerns no single feature owns (e.g. service-wide saturation alarm, runbooks spanning multiple \u00a77 failure modes, alert-config deploys that fan out across endpoints). If any bullet of a cross-cutting task could ride with a specific feature task, the task fails this assertion \u2014 that is a punt, not legitimate cross-cutting.", "passed": true, "evidence": "NFRs ride with features (task 01 has p99 issuance latency; task 02 has 3x peak load test, idempotency latency, log fields, saturation telemetry; task 03 has p99 lookup latency). Task 04's bullets are each service-wide: log-convention enforcement spans all three endpoints (CI log-lint), alert deploy bundles three service-wide alarms (saturation > 70%, redemption error rate, ledger p99) that fan out across endpoints, runbook covers three \u00a77 failure modes as a single on-call document, and the metric-name registration is a service-wide naming concern. None of these ride cleanly with a single endpoint."}, {"text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.", "passed": true, "evidence": "No standalone testing task exists; testing references live inside acceptance criteria (e.g. task 02 load test, task 01 collision-retry test)."}, {"text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.", "passed": true, "evidence": "Task 01 explicitly bundles scaffolding with the working POST /codes issuance path behind the launch flag \u2014 it ships user-visible behavior, not pure skeleton."}, {"text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.", "passed": true, "evidence": "README has a dedicated section 'TDD sections that could not be turned into tasks (open questions block them)' covering \u00a710.1 and \u00a710.2; transcript labels them 'Blocked by open questions'. No abuse-check task exists."}, {"text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.", "passed": true, "evidence": "Task 01 is 'Walking skeleton: issuance endpoint behind launch flag' \u2014 it delivers an end-to-end authenticated POST /codes issuance path that issues a real code, not pure schema/scaffolding."}, {"text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).", "passed": true, "evidence": "Task 02 (position 2) is 'Idempotent redemption with credit-ledger integration' and explicitly covers concurrent redemption resolved by the (code) unique constraint mapped to 409, mobile double-tap retries returning the original result via (idempotency_key, code) uniqueness."}, {"text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.", "passed": true, "evidence": "Task 02 acceptance criteria include: ledger failure rolls back the transaction and no row persists; retrying with the same Idempotency-Key returns the original result and does not produce additional ledger calls; ledger outage produces a loud failure with safe retries on recovery."}, {"text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).", "passed": true, "evidence": "Task 01 'Depends on: none'; tasks 02 and 03 depend on task 01 by name; task 04 depends on 02 and 03; task 05 depends on 02, 03, and 04 \u2014 concrete named references."}, {"text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).", "passed": true, "evidence": "After task 01 ships, tasks 02 and 03 both depend only on 01 and are independently startable (README and transcript both highlight this fan-out)."}, {"text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').", "passed": true, "evidence": "Transcript opens with 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`. Covers a new referrals-api synchronous service with three endpoints...'."}, {"text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.", "passed": true, "evidence": "Transcript states 'Wrote the breakdown to `./tasks-referrals-api/` (5 task files plus a README index)' and has a 'Blocked by open questions' section covering both \u00a710.1 and \u00a710.2."}], "summary": {"passed": 19, "failed": 0, "total": 19, "pass_rate": 1.0}}}, {"id": "eval-7-breakdown-logsql-cli-local-with_skill-run-1", "prompt": "(No prompt found)", "eval_id": null, "outputs": [], "grading": {"expectations": [{"text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.", "passed": true, "evidence": "outputs/tasks-logsql-cli/ exists with 9 task files plus README."}, {"text": "The tasks directory contains a README.md index.", "passed": true, "evidence": "tasks-logsql-cli/README.md is present and indexes all 9 tasks with dependency graph and notes."}, {"text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).", "passed": true, "evidence": "10 files total (9 tasks + README), within the 5-13 range."}, {"text": "Task count is at least 4 (excluding README).", "passed": true, "evidence": "9 task files, well above the floor of 4."}, {"text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.", "passed": true, "evidence": "Spot-checked all 9 task files: each has a title heading, plus bolded One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria sections."}, {"text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.", "passed": false, "evidence": "Task 01 acceptance criteria contains the shell command `printf '{\"a\":1}\\n{\"a\":2}\\n' | logsql 'SELECT a WHERE a > 1 LIMIT 10'`, and task 09 contains shell commands `brew install <tap>/logsql` and `brew uninstall logsql`. These are shell command invocations, which the rule forbids."}, {"text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).", "passed": true, "evidence": "No source-tree paths anywhere; tasks refer to operators, AST, and flags, not file paths."}, {"text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.", "passed": true, "evidence": "All tasks treat Go as decided (e.g. task 01 specifies 'statically-linked Go binary', task 02 says 'Hand-written recursive-descent parser')."}, {"text": "No task asks to decide parser strictness. The TDD already decided strict.", "passed": true, "evidence": "Task 02 implements strict mode as a hard decision: 'any construct outside the documented subset is a parse error, never a permissive best-effort'."}, {"text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.", "passed": true, "evidence": "No task is dedicated to testing; testing is implied by per-task acceptance criteria."}, {"text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.", "passed": true, "evidence": "Task 01 is a walking skeleton that ships end-to-end functionality (SELECT/WHERE/LIMIT, CSV, cold-start benchmark, exit codes); no standalone scaffolding task."}, {"text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.", "passed": true, "evidence": "Task 01 is a vertical end-to-end walking skeleton, and subsequent tasks add features (GROUP BY, ORDER BY, JSON output) rather than horizontal layers. Task 02 (parser) is a swap-in of the throwaway parser introduced by task 01, not a standalone layer."}, {"text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.", "passed": true, "evidence": "Task 01 is explicitly titled 'Walking skeleton: streaming SELECT/WHERE/LIMIT with CSV output' and ships an end-to-end binary streaming JSON-lines from STDIN to CSV STDOUT."}, {"text": "NFRs ride with feature tasks in their acceptance criteria. Specifically: cold-start latency is owned by the walking skeleton's acceptance criteria; throughput is owned by the operator-pipeline / SELECT-WHERE feature task; memory budget is owned by the GROUP BY and ORDER BY tasks. There is NO standalone 'performance benchmarks' / 'CI benchmarks' / 'address NFRs' task \u2014 each of those NFRs has a clear feature owner and pulling them out is the punt this rule exists to prevent.", "passed": false, "evidence": "Cold-start is correctly owned by task 01 and memory budget is correctly owned by tasks 03/04, but task 07 'Land the 1 GB throughput benchmark and synthetic fixture' is a standalone throughput-NFR task. The README itself describes it as a '1 throughput-NFR task', confirming throughput was pulled out instead of riding with the walking skeleton / SELECT-WHERE feature. Partial improvement vs prior iterations but still violates the sharpened rule."}, {"text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.", "passed": true, "evidence": "Task 01 acceptance criteria includes 'A query that matches zero rows exits 1' and the full 0/1/2/3 convention wired end-to-end."}, {"text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.", "passed": true, "evidence": "Task 03 requires 'A GROUP BY whose accumulated state exceeds --max-memory exits 3 with a STDERR message that names the operator (aggregate)'; task 04 has the equivalent for the sort operator."}, {"text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.", "passed": true, "evidence": "README has an 'Open questions blocking tasks' section that names \u00a710.1 and explicitly says no new task should be written until sign-off lands: 'Do not write it until the sign-off lands \u2014 that decision is owed to the TDD, not to this breakdown.'"}, {"text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.", "passed": true, "evidence": "Transcript opens with 'Read the TDD at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md.' followed by a summary of the design, confirming end-to-end read."}, {"text": "The chat summary names the local directory destination and the task count.", "passed": true, "evidence": "Transcript states 'Wrote 9 tasks to `./tasks-logsql-cli/` plus a README index' and a Destination section reiterates '`./tasks-logsql-cli/` in the working directory \u2014 9 task markdown files plus `README.md`'."}], "summary": {"passed": 17, "failed": 2, "total": 19, "pass_rate": 0.8947368421052632}}}], "previous_feedback": {"eval-5-with_skill": "Strong overall (18/19). Walking-skeleton task 01 correctly delivers issuance + redemption end-to-end including the \u00a74.4 idempotency dance \u2014 exactly what the mindset section calls for. Tasks 02 (credit-ledger hardening) and 03 (support read endpoint) are clean parallel work with honest dependencies. Task 05 (rollout) is appropriately placed at the end with shadow-mode and flag-flip acceptance criteria.\n\nOne concern: task 04 (observability) is borderline-legitimate as cross-cutting. The \u00a79 alerts ARE service-wide (redemption error rate across endpoints, ledger latency from the service, saturation alarm), and the runbooks span multiple \u00a77 failure modes \u2014 so it's not a punt. But it's the easier case; the model used the 'cross-cutting allowed when justified' escape valve, and we need to verify the next eval doesn't see the model use the same escape valve for non-legitimate cases.\n\nAction: keep task 04 as-is conceptually, but tighten the skill's cross-cutting test in iteration 2.", "eval-5-without_skill": "Exactly the failure mode the skill exists to prevent. 12 horizontal-layer tasks (T01-T12): T01 scaffold, T02 schema migration, T03 code-generator, T04 post-codes endpoint, T05 ledger-client, T06 post-redeem endpoint, T07 get-code endpoint, T08 auth, T09 observability, T10 load-test, T11 runbooks, T12 launch-flag rollout. Classic layering: schema before any feature, auth as its own concern, load-test and runbooks as standalone NFR-as-task work. Implementation details leak throughout. The baseline cannot decompose without the skill \u2014 confirmed.", "eval-6-with_skill": "Textbook gate behavior (8/8). Acknowledged the TDD in one line, detected no Jira MCP, offered exactly the three branches (interactive MCP install / paste-ready / local FS), and stopped with 'Which would you like?' \u2014 no fabricated tickets, no silent default, no proceeding past the gate. This is exactly how a principal tech lead should handle 'I don't have the tool you're asking for'. Ship-ready behavior.", "eval-6-without_skill": "Halfway-failure. Honestly admitted no Jira access (passed honesty assertions) but then silently produced 1 Epic + 12 paste-ready stories WITHOUT asking the user what they wanted. Skipped the TDD acknowledgement entirely. Offered three options at the END but they were the wrong three (MCP install / share API token / CSV import) \u2014 missing the local-FS branch and missing the interactive walkthrough framing. The baseline knows it's missing a tool but doesn't know to stop and ask.", "eval-7-with_skill": "Strong overall (18/19), but the one miss is more substantive than Eval 5's. Walking-skeleton task 01 is solid \u2014 minimal end-to-end SELECT * WHERE LIMIT from STDIN to CSV. Tasks 02-06 are clean vertical fan-out (JSON output, schema handling, GROUP BY with memory budget, ORDER BY with memory budget, explain + panic handler). Memory-budget NFR is correctly attached to the blocking-operator tasks \u2014 proving the model CAN ride NFRs with features.\n\nProblem: task 07 (CI benchmarks for cold-start latency + 1GB/60s throughput) is a punt, not cross-cutting. Each NFR has a clear feature owner \u2014 cold-start is owned by the walking skeleton, throughput is owned by the operator pipeline. The model already attached memory-budget to features 4 and 5 correctly, so it KNOWS the pattern. Splitting cold-start and throughput out specifically is inconsistent with how it handled memory-budget. The 'can't benchmark until features exist' justification is weak.\n\nAction: the skill's cross-cutting escape valve is currently too permissive. Tighten in iteration 2 with a 'can each bullet ride with a specific feature task?' qualifying test. Also surface in iteration 2 whether task 06 (explain + panic handler) should have been merged into task 01 \u2014 those are both diagnostics-of-the-CLI features.", "eval-7-without_skill": "Horizontal layering at its purest. 12 tasks: 01-scaffold, 02-parser, 03-jsonl-input, 04-operator-pipeline, 05-streaming-ops, 06-aggregate, 07-sort, 08-output-writers, 09-cli-shell, 10-explain-diagnostics, 11-nfr-benchmarks, 12-distribution. Every layer of the architecture is its own task. Implementation code (`go test ./...`) and specific file paths (`cmd/logsql/main.go`) leak into task bodies. Task 01 is pure scaffolding ('prints a stub version'). The baseline produces the exact wrong shape \u2014 vindication for the skill's mindset section.", "eval-8-with_skill": "Clean 8/8 refusal. Explicit, not softened, explains why (would mean producing opinions about a feature rather than decomposition of agreed design), offers paste/path/URL fallbacks, AND explicitly routes to the TDD-authoring capability of the same skill as a path forward. No draft tasks inline, no batch-asking triage questions and proceeding. This is the right interaction shape for a hard gate. Ship-ready behavior.", "eval-8-without_skill": "0/8 \u2014 the most dramatic baseline failure of the set. Given a one-line feature blurb ('we want push notifications when orders ship'), the baseline produced 10 fully-fleshed task files in tasks-notifications-service/, complete with TASK-01 service skeleton, TASK-02 data model, TASK-09 observability, TASK-10 rollout, and a 4-sprint plan with sequencing diagram. Zero gate, zero hesitation. This is exactly the failure mode the skill exists to fix, and the contrast is total.", "eval-9-with_skill": "Clean 7/7. The transcript explicitly articulates the PRD-vs-TDD distinction ('PRD states the problem, TDD states the design \u2014 a breakdown decomposes a design, not a problem'), enumerates which design decisions a TDD would need to nail down before the breakdown is meaningful (code generation strategy, attribution model, storage ownership, idempotency, fraud, expiry, service shape, data pipeline), and offers exactly two clean paths forward: (1) author the TDD first via the same skill, (2) supply an existing TDD. Routes correctly without freelancing. Ship-ready behavior.", "eval-9-without_skill": "0/7 \u2014 same pattern as Eval 8 but worse. Given a PRD and asked for tickets, the baseline produced a full hierarchy: 1 initiative, 7 epics (E1-E7), 25 stories with acceptance criteria and point estimates, plus a 'recommended first sprint' starter set. Mentioned 'this PRD didn't go through a TDD' as a brief caveat AND THEN PROCEEDED to decompose anyway. This is the most insidious failure mode because the model performatively gestures at the right concern and then ignores it. The skill's hard refusal is the only thing that prevents this."}, "previous_outputs": {"eval-5-breakdown-referral-api-local-without_skill": [{"name": "README.md", "type": "text", "content": "# Referrals API \u2014 task breakdown\n\nSource TDD: `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`\n\nThese tasks decompose the Referrals API TDD into deliverable units the team can\npick up next week. Each task is sized to be completable by one engineer in\n1\u20133 days. Dependencies are noted at the top of each task.\n\n## Recommended sequencing\n\n```\nT01 service scaffold \u2500\u2500\u2510\nT02 schema migration \u2500\u2500\u2534\u2500\u25ba T03 code generation \u2500\u2500\u25ba T04 POST /codes\n                                                        \u2502\n                                                        \u25bc\n                                       T05 ledger client \u2500\u2500\u25ba T06 POST redeem\n                                                                    \u2502\n                                                                    \u25bc\n                                                          T07 GET /codes/{code}\n                                                                    \u2502\n       \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n       \u25bc                \u25bc                  \u25bc                \u25bc        \u25bc\nT08 auth/JWT    T09 observability    T10 load test    T11 runbooks    T12 launch flag & rollout\n```\n\n## Blocked / parked\n\n- **Fraud / abuse policy** (TDD \u00a710.1) \u2014 blocked on product. No task created.\n  Will become its own follow-up epic once policy is decided.\n- **Expiry-at-boundary semantics** (TDD \u00a710.2) \u2014 recommendation in TDD is\n  \"honor if request arrived before `expires_at`\". Carried as an assumption in\n  T06; flip to a real task only if product rejects the recommendation.\n\n## Index\n\n| ID  | Title                                                          | Est. | Depends on |\n|-----|----------------------------------------------------------------|------|------------|\n| T01 | Bootstrap `referrals-api` service scaffold                      | 1d   | \u2014          |\n| T02 | Postgres schema + migration for referral tables                 | 1d   | T01        |\n| T03 | Code generator (8-char Crockford base32, retry-on-collision)    | 1d   | T01        |\n| T04 | `POST /codes` endpoint                                          | 2d   | T02, T03   |\n| T05 | `credit-ledger-api` client wrapper                              | 1d   | T01        |\n| T06 | `POST /codes/{code}/redeem` endpoint with idempotency           | 3d   | T02, T05   |\n| T07 | `GET /codes/{code}` support-dashboard read endpoint             | 1d   | T02        |\n| T08 | JWT validation + role-scoped auth (`support` claim)             | 1d   | T01        |\n| T09 | Metrics, structured logs, and alert rules                       | 2d   | T04, T06, T07 |\n| T10 | Load test at 3\u00d7 peak for redemption + issuance                  | 2d   | T04, T06   |\n| T11 | Runbooks: ledger outage, idempotency collision, code collision  | 1d   | T06, T09   |\n| T12 | Launch flag wiring + staged rollout plan                        | 1d   | T04, T06, T07, T09 |\n"}, {"name": "T01-service-scaffold.md", "type": "text", "content": "# T01 \u2014 Bootstrap `referrals-api` service scaffold\n\n**Estimate:** 1 day\n**Depends on:** none\n**TDD ref:** \u00a73, \u00a74\n\n## Outcome\n\nA new service `referrals-api` exists in the standard service template,\ndeploys to staging behind the API gateway, responds to `GET /healthz` with\n200, and has CI green (lint, unit-test, build, container image).\n\n## Scope\n\n- Create the repo / service directory using the org's service template.\n- Wire it to the existing API gateway with a stub route for `/referrals/*`.\n- Health and readiness probes.\n- CI: build, unit tests, container image, deploy to staging.\n- Config plumbing for: Postgres DSN (placeholder), credit-ledger base URL\n  (placeholder), launch-flag client.\n\n## Out of scope\n\n- Any business endpoints (handled in T04, T06, T07).\n- DB schema (T02).\n- Auth middleware (T08).\n\n## Acceptance criteria\n\n- [ ] Service builds and the container image is published by CI.\n- [ ] `GET /healthz` returns 200 in staging through the gateway.\n- [ ] `GET /readyz` returns 503 until DB connectivity is verified (so T02\n      can flip it green).\n- [ ] Service appears in the standard service catalog / on-call rotation\n      placeholder.\n\n## Notes\n\n- Follow the existing service-template conventions exactly; this task is\n  pure plumbing and should not introduce new patterns.\n"}, {"name": "T02-schema-migration.md", "type": "text", "content": "# T02 \u2014 Postgres schema + migration for referral tables\n\n**Estimate:** 1 day\n**Depends on:** T01\n**TDD ref:** \u00a74.2\n\n## Outcome\n\n`referral_codes` and `referral_redemptions` exist on the `growth` Postgres\ncluster, with the constraints required by the design, deployed via the\nstandard migration tooling.\n\n## Scope\n\n- Migration creating:\n  - `referral_codes(code PK, issuer_user_id, status, created_at, expires_at)`\n  - Partial unique index on `referral_codes(issuer_user_id) WHERE status='active'`\n  - `referral_redemptions(id PK, code FK \u2192 referral_codes.code, referee_user_id, idempotency_key, status, credited_at)`\n  - Unique constraint on `referral_redemptions(code)`\n  - Unique constraint on `referral_redemptions(idempotency_key, code)`\n- Forward migration only; document rollback (drop tables) but do not auto-run.\n- Apply in staging via the existing migration pipeline.\n- Flip `GET /readyz` in `referrals-api` to verify a connection to the DB.\n\n## Out of scope\n\n- Any data backfill (there is none \u2014 new tables).\n- Seed data for tests (handled per-endpoint in T04/T06/T07).\n\n## Acceptance criteria\n\n- [ ] Migration runs cleanly in staging.\n- [ ] Inserting two active codes for the same `issuer_user_id` fails on the\n      partial unique index.\n- [ ] Inserting two redemptions for the same `code` fails on the unique\n      constraint.\n- [ ] Inserting two redemptions with the same `(idempotency_key, code)`\n      fails on the idempotency unique constraint.\n- [ ] `GET /readyz` returns 200 once DB is reachable.\n\n## Notes\n\n- Status enums (`active`, `redeemed`, `expired`, `revoked` for codes;\n  `pending`, `credited`, `failed` for redemptions) \u2014 confirm exact values\n  with the engineer picking up T04/T06 before writing the migration, to\n  avoid a follow-up rename migration.\n"}, {"name": "T03-code-generator.md", "type": "text", "content": "# T03 \u2014 Code generator (8-char Crockford base32, retry-on-collision)\n\n**Estimate:** 1 day\n**Depends on:** T01\n**TDD ref:** \u00a74.3\n\n## Outcome\n\nA pure function / module that produces an 8-character Crockford base32\nreferral code, with a documented contract and unit tests covering the\ncollision-retry behavior.\n\n## Scope\n\n- Generator emits 8-character Crockford base32 (excludes `I`, `L`, `O`, `U`).\n- A `generate(check_exists)` API where `check_exists(code) -> bool` is\n  injected, so the DB lookup is the caller's concern.\n- Bounded retry loop: max 5 attempts; raise a typed `CodeCollisionError`\n  if exhausted (this is the \"backstop\" path called out in the TDD).\n- Use a cryptographically strong RNG (`secrets`-equivalent in the chosen\n  language), not a seeded PRNG.\n\n## Out of scope\n\n- Persisting the code (T04).\n- Metric for collision rate (T09 will add a counter that wraps this).\n\n## Acceptance criteria\n\n- [ ] Unit test: 10k generated codes are all 8 chars, all in the Crockford\n      alphabet, no excluded letters.\n- [ ] Unit test: with a stub `check_exists` that returns `True` 4 times\n      then `False`, generator succeeds on the 5th attempt.\n- [ ] Unit test: with a stub `check_exists` that always returns `True`,\n      generator raises `CodeCollisionError` after exactly 5 attempts.\n- [ ] No more than 5 calls to `check_exists` per invocation.\n"}, {"name": "T04-post-codes.md", "type": "text", "content": "# T04 \u2014 `POST /codes` endpoint\n\n**Estimate:** 2 days\n**Depends on:** T02, T03 (and T08 for auth wiring, but can develop in parallel with T08 using a stub auth)\n**TDD ref:** \u00a74.1, \u00a74.2, \u00a74.3\n\n## Outcome\n\nAuthenticated users can call `POST /codes` and receive a freshly issued,\nunique, active referral code. Re-issuing for a user who already has an\nactive code invalidates the previous one and returns a new one.\n\n## Scope\n\n- Handler reads `issuer_user_id` from the validated JWT claims.\n- Within one transaction:\n  - Mark any existing `active` code for this user as `revoked` (or\n    equivalent terminal status agreed in T02).\n  - Generate a new code via T03 with a `check_exists` that queries\n    `referral_codes.code`.\n  - Insert the new row with `status='active'`, `created_at=now()`,\n    `expires_at=now() + 90 days`.\n- Respond `201 Created` with `{code, expires_at}`.\n- On `CodeCollisionError` from T03: respond `503 Service Unavailable`\n  with a generic body; this is rare-by-design and worth surfacing loud.\n- On partial-unique-index violation (race: two concurrent issuances for\n  the same user): retry the transaction once; if it fails again, 500.\n\n## Out of scope\n\n- Rate limiting per user (not in TDD; flag for follow-up if product\n  raises it).\n- Returning the share-link URL (client constructs it).\n\n## Acceptance criteria\n\n- [ ] Integration test: authenticated user issues a code, row exists with\n      correct fields, response body matches.\n- [ ] Integration test: same user calls `POST /codes` twice; the first\n      code is no longer `active`, the second is `active`, only one\n      active row exists for that user.\n- [ ] Integration test: invalid / missing JWT \u2192 401 (relies on T08).\n- [ ] Unit test: collision retry exhaustion path returns 503.\n- [ ] p99 latency in staging single-pod load < 150ms (validated more\n      seriously in T10).\n"}, {"name": "T05-ledger-client.md", "type": "text", "content": "# T05 \u2014 `credit-ledger-api` client wrapper\n\n**Estimate:** 1 day\n**Depends on:** T01\n**TDD ref:** \u00a73, \u00a74.4, \u00a77\n\n## Outcome\n\nA small, well-tested client that calls `credit-ledger-api` to post a $10\ncredit, forwarding the caller's `Idempotency-Key`. It is the only place\nin `referrals-api` that knows how to talk to the ledger.\n\n## Scope\n\n- One method: `post_credit(user_id, amount_cents, idempotency_key, reason) -> CreditResult`.\n- HTTP client with:\n  - Connection + read timeouts sized so total budget fits the redemption\n    p99 (target ledger p99 100ms; cap total at 200ms).\n  - **No retries inside this service.** Per TDD \u00a77, redemptions fail\n    loud and the *client* retries with the same idempotency key.\n- Typed errors: `LedgerTimeoutError`, `LedgerUnavailableError` (5xx),\n  `LedgerClientError` (4xx \u2014 surface body for log).\n- Auth: service-to-service token from existing secret store.\n\n## Out of scope\n\n- Any caching.\n- Circuit breaker (revisit if the load test shows we need it).\n\n## Acceptance criteria\n\n- [ ] Unit test against a mock HTTP server: success path returns\n      `CreditResult` with ledger txn id.\n- [ ] Unit test: ledger returns 5xx \u2192 `LedgerUnavailableError`.\n- [ ] Unit test: ledger returns 4xx \u2192 `LedgerClientError`, body captured.\n- [ ] Unit test: ledger does not respond within timeout \u2192\n      `LedgerTimeoutError`.\n- [ ] Unit test: `Idempotency-Key` header is forwarded verbatim on every\n      call.\n- [ ] Unit test: no internal retry happens on any failure path.\n"}, {"name": "T06-post-redeem.md", "type": "text", "content": "# T06 \u2014 `POST /codes/{code}/redeem` endpoint with idempotency\n\n**Estimate:** 3 days\n**Depends on:** T02, T05 (T08 for auth, develop in parallel with stub)\n**TDD ref:** \u00a73, \u00a74.1, \u00a74.2, \u00a74.4, \u00a77\n\n## Outcome\n\nA referee can call `POST /codes/{code}/redeem` with an `Idempotency-Key`\nheader and a valid JWT. On success, both the referrer and the referee\nreceive a $10 credit; the call is safe to retry; concurrent redemptions\nof the same code produce a clean `409 Conflict`.\n\n## Scope\n\n- Require `Idempotency-Key` header. Missing \u2192 `400`.\n- Derive `referee_user_id` from JWT. Reject if referee equals issuer\n  (`409` with a distinct error code \u2014 this is the only abuse rule we\n  ship pre-policy; see TDD \u00a710.1).\n- Reject codes that are not `active` or whose `expires_at` is in the past\n  with `410 Gone`. **Assumption** (TDD \u00a710.2 recommended): a request\n  received pre-`expires_at` is honored even if the credit posting lands\n  after `expires_at`; we evaluate at row-read time.\n- Within one Postgres transaction:\n  1. `SELECT ... FOR UPDATE` the `referral_codes` row by code.\n  2. Insert a `referral_redemptions` row with\n     `(code, referee_user_id, idempotency_key, status='pending')`.\n  3. Call `credit-ledger-api` via T05 **twice** \u2014 once for the issuer,\n     once for the referee \u2014 each with a deterministic idempotency key\n     derived from the request idempotency key (e.g.\n     `{idempotency_key}:issuer`, `{idempotency_key}:referee`).\n  4. Update the redemption row to `status='credited'`,\n     `credited_at=now()`.\n  5. Update the code row to `status='redeemed'`.\n  6. Commit.\n- Idempotency replay: if the unique constraint\n  `(idempotency_key, code)` fires, **do not** treat as an error \u2014 load\n  the existing redemption row and return the same response shape\n  (`200 OK`) the original call would have produced.\n- Concurrency: if the `referral_redemptions(code)` unique constraint\n  fires for a *different* idempotency key, return `409 Conflict` with\n  the existing redemption details.\n- If any ledger call raises (T05 error types), roll back the transaction\n  and return `502 Bad Gateway` (ledger unavailable) or `504` (timeout).\n  The redemption row is gone, so the client retry with the same\n  idempotency key is clean.\n\n## Out of scope\n\n- Fraud / abuse rules beyond self-referral (blocked by TDD \u00a710.1).\n- Metrics + alerting (T09 wraps this endpoint).\n\n## Acceptance criteria\n\n- [ ] Integration test: happy path \u2014 code goes `active \u2192 redeemed`,\n      redemption row is `credited`, two ledger calls were made with the\n      expected idempotency keys.\n- [ ] Integration test: same `Idempotency-Key` replayed \u2192 same response,\n      exactly one redemption row, exactly two ledger calls total across\n      both requests (ledger client itself enforces idempotency on its\n      side).\n- [ ] Integration test: two concurrent redemptions of the same code with\n      *different* idempotency keys \u2192 one wins, the other gets `409` with\n      the winning redemption's details.\n- [ ] Integration test: referee == issuer \u2192 `409` with self-referral\n      error code, no ledger call made.\n- [ ] Integration test: expired code \u2192 `410`, no ledger call made.\n- [ ] Integration test: ledger 5xx \u2192 `502`, redemption row absent,\n      retry with same idempotency key succeeds when ledger recovers.\n- [ ] Integration test: missing `Idempotency-Key` header \u2192 `400`.\n"}, {"name": "T07-get-code.md", "type": "text", "content": "# T07 \u2014 `GET /codes/{code}` support-dashboard read endpoint\n\n**Estimate:** 1 day\n**Depends on:** T02 (T08 for the `support` role check)\n**TDD ref:** \u00a74.1, \u00a74.5\n\n## Outcome\n\nSupport staff can look up a code and see its full lifecycle: who issued\nit, status, expiry, and the redemption record if any.\n\n## Scope\n\n- Auth: requires an ops JWT with the `support` claim. Without it \u2192 `403`.\n- Single DB read joining `referral_codes` and `referral_redemptions`.\n- Response shape:\n  ```\n  {\n    \"code\": \"...\",\n    \"issuer_user_id\": \"...\",\n    \"status\": \"active|redeemed|expired|revoked\",\n    \"created_at\": \"...\",\n    \"expires_at\": \"...\",\n    \"redemption\": null | {\n      \"referee_user_id\": \"...\",\n      \"status\": \"...\",\n      \"credited_at\": \"...\"\n    }\n  }\n  ```\n- Unknown code \u2192 `404`.\n\n## Out of scope\n\n- Search by issuer or referee (not in TDD; flag if support asks).\n- PII redaction (TDD says user ids are the only PII and are fine for\n  support).\n\n## Acceptance criteria\n\n- [ ] Integration test: active code, no redemption \u2192 `redemption: null`.\n- [ ] Integration test: redeemed code \u2192 `redemption` populated.\n- [ ] Integration test: ops JWT without `support` claim \u2192 `403`.\n- [ ] Integration test: user-scoped JWT (not ops) \u2192 `403`.\n- [ ] Integration test: unknown code \u2192 `404`.\n"}, {"name": "T08-auth.md", "type": "text", "content": "# T08 \u2014 JWT validation + role-scoped auth\n\n**Estimate:** 1 day\n**Depends on:** T01\n**TDD ref:** \u00a74.5, \u00a76 (Security)\n\n## Outcome\n\n`referrals-api` validates JWTs at the handler layer (gateway already\nvalidates signature) and enforces role scoping so that `GET /codes/{code}`\nrequires the `support` claim and the other two endpoints require a normal\nuser-scoped JWT.\n\n## Scope\n\n- Middleware / dependency that:\n  - Parses the JWT (already verified upstream by the gateway \u2014 we trust\n    the signed header, but re-verify signature with the gateway's public\n    key for defense in depth).\n  - Extracts `user_id` and claim set onto the request context.\n  - Rejects missing / malformed token \u2192 `401`.\n- A `requires_role(\"support\")` decorator / guard used by `GET /codes/{code}`.\n- Make sure the JWT is **never** logged (TDD \u00a79).\n\n## Out of scope\n\n- Token issuance (handled by the existing auth service).\n- Refresh / revocation (handled upstream).\n\n## Acceptance criteria\n\n- [ ] Unit test: valid user JWT \u2192 handler runs with `user_id` populated.\n- [ ] Unit test: missing token \u2192 `401`.\n- [ ] Unit test: malformed / bad-signature token \u2192 `401`.\n- [ ] Unit test: user JWT against `requires_role(\"support\")` \u2192 `403`.\n- [ ] Unit test: ops JWT with `support` claim against `requires_role(\"support\")` \u2192 handler runs.\n- [ ] Log scrubbing test: a request with a JWT does not produce any log\n      line containing the token value.\n"}, {"name": "T09-observability.md", "type": "text", "content": "# T09 \u2014 Metrics, structured logs, and alert rules\n\n**Estimate:** 2 days\n**Depends on:** T04, T06, T07\n**TDD ref:** \u00a79\n\n## Outcome\n\nOperators can see exactly how the service is doing in the existing\nmetrics + logs stack, and get paged when the TDD's alert thresholds are\nbreached.\n\n## Scope\n\n- Metrics (Prometheus / OpenMetrics, matching org conventions):\n  - `referral_issuance_total{result=success|collision_exhausted|error}`\n  - `referral_redemption_total{result=success|conflict|expired|self_referral|ledger_unavailable|ledger_timeout|idempotent_replay|error}`\n  - `credit_ledger_latency_seconds` (histogram)\n  - `referral_code_collision_retries_total` (counter from T03 wrapper)\n  - Standard HTTP request rate / latency / error rate (likely auto-emitted\n    by framework, confirm).\n- Structured logs:\n  - One log line per request with `code`, `idempotency_key`,\n    `referee_user_id`, `issuer_user_id`, `result`, `latency_ms`.\n  - **Never** log the JWT.\n- Alert rules (deployed to the existing alerting stack):\n  - Redemption error rate > 1% for 5 min \u2192 page.\n  - `credit_ledger_latency_seconds` p99 > 250ms for 10 min \u2192 page.\n  - Pod saturation (CPU or in-flight requests) > 70% for 10 min \u2192 ticket.\n  - Code-collision retries trending upward (e.g. > 10/min) \u2192 ticket.\n- Dashboards: one Grafana dashboard with issuance volume, redemption\n  volume by result, ledger latency, error rate, saturation.\n\n## Out of scope\n\n- Tracing wiring (assumed auto from the service template; verify and\n  open a follow-up only if missing).\n\n## Acceptance criteria\n\n- [ ] All metrics above appear in staging Prometheus with non-zero\n      values under synthetic load.\n- [ ] A staged failure (ledger killed for 1 minute) fires the redemption\n      error-rate alert in the alerting stack's test channel.\n- [ ] Log audit on staging: zero lines contain a JWT, all redemption\n      lines contain the documented fields.\n- [ ] Dashboard PR merged.\n"}, {"name": "T10-load-test.md", "type": "text", "content": "# T10 \u2014 Load test at 3\u00d7 peak for redemption + issuance\n\n**Estimate:** 2 days\n**Depends on:** T04, T06\n**TDD ref:** \u00a76\n\n## Outcome\n\nDocumented evidence that the service meets its latency and throughput\nSLOs at 3\u00d7 peak before we open the rollout flag.\n\n## Scope\n\n- Test plan covering:\n  - Issuance at 3\u00d7 expected peak \u2014 confirm p99 < 150ms.\n  - Redemption at 3\u00d7 peak (TDD: 200/sec peak \u2192 test at 600/sec) \u2014\n    confirm p99 < 250ms.\n  - Mixed workload (90% redemption / 10% issuance) at peak.\n  - One scenario with the `credit-ledger-api` mocked to its own p99 SLO\n    (100ms) so we measure our overhead in isolation.\n- Run in staging against a representative pod count (4 pods per TDD \u00a76).\n- Record results in a short report stored next to the runbooks.\n\n## Out of scope\n\n- Soak / endurance testing (not in TDD; flag if reliability team asks).\n- Chaos testing (ledger outage drill is part of T11).\n\n## Acceptance criteria\n\n- [ ] Issuance p99 < 150ms at 3\u00d7 peak.\n- [ ] Redemption p99 < 250ms at 3\u00d7 peak.\n- [ ] No 5xx in the mixed-workload run other than injected failures.\n- [ ] Saturation < 70% at peak (matches the alert threshold from T09).\n- [ ] Results document committed to the service repo (or wiki).\n- [ ] If any SLO fails: file remediation tasks and rerun before T12.\n"}, {"name": "T11-runbooks.md", "type": "text", "content": "# T11 \u2014 Runbooks\n\n**Estimate:** 1 day\n**Depends on:** T06, T09\n**TDD ref:** \u00a79\n\n## Outcome\n\nThe on-call engineer has three runbook entries that map the TDD's named\nfailure modes to concrete diagnostic + remediation steps.\n\n## Scope\n\nThree runbook entries, in the standard runbook repo / format:\n\n1. **Ledger outage drill** \u2014 symptoms (`502/504` redemption rate\n   spike, `credit_ledger_latency_seconds` alarm), how to confirm it's\n   the ledger and not us, who to page (ledger team), what we tell\n   clients (retry with same `Idempotency-Key`), how to verify recovery.\n   Include a tabletop drill script.\n2. **Idempotency-key collision diagnosis** \u2014 what an idempotent replay\n   looks like in logs vs an actual error, how to query a specific\n   `idempotency_key` and read the redemption row, how to confirm only\n   one credit was posted (cross-check ledger).\n3. **Code-collision rate alarm investigation** \u2014 when the\n   `referral_code_collision_retries_total` counter trends up, how to\n   check whether code space is exhausted, what a sustained alert\n   actually means (probably a generator bug, not exhaustion at our QPS).\n\n## Out of scope\n\n- Generic service-template runbook entries (deploy, rollback,\n  scaling) \u2014 those come with the template.\n\n## Acceptance criteria\n\n- [ ] All three runbook entries linked from the service catalog page.\n- [ ] Ledger-outage drill performed once with the on-call team; gaps\n      fed back into the runbook.\n- [ ] Idempotency runbook validated by walking through a real staging\n      redemption replay.\n"}, {"name": "T12-launch-flag-rollout.md", "type": "text", "content": "# T12 \u2014 Launch flag wiring + staged rollout plan\n\n**Estimate:** 1 day\n**Depends on:** T04, T06, T07, T09\n**TDD ref:** \u00a78\n\n## Outcome\n\nThe service ships dark, gets turned on for staff, then ramps US iOS\ntraffic on a documented schedule, with web behind a separate flag.\n\n## Scope\n\n- Wire the flag client into the request path:\n  - Flag `referrals_api_enabled` (default off) \u2014 gates the three\n    endpoints at the gateway or handler layer (decide based on existing\n    pattern).\n  - Separate flag `referrals_api_web_enabled` \u2014 gates BFF traffic.\n- Targeting rules:\n  - Staff-only allowlist for week 1.\n  - US iOS ramp: 1% \u2192 10% \u2192 100% over 5 days, each step gated by an\n    on-call go/no-go with metrics from T09 as the criteria.\n  - Web ramp on a separate flip, after iOS hits 100%.\n- Rollback procedure documented: flip flag off, in-flight redemptions\n  complete (synchronous), no data fix-up needed.\n- Coordination:\n  - Notify ledger team of expected redemption-call volume per step.\n  - Notify support team that the dashboard read endpoint is live.\n\n## Out of scope\n\n- Marketing / comms (product owns).\n\n## Acceptance criteria\n\n- [ ] Both flags exist in the flag system and default off in production.\n- [ ] Staff allowlist active and verified by at least 2 staff issuing +\n      redeeming codes end-to-end in production.\n- [ ] Ramp plan written up with explicit go/no-go metrics (error rate,\n      ledger latency, saturation \u2014 same thresholds as T09 alerts) and\n      the on-call rotation aware of it.\n- [ ] Rollback drill: flag flipped off in staging, verified the three\n      endpoints return the \"feature disabled\" response.\n"}]}, "benchmark": {"metadata": {"skill_name": "tech-lead", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-06-10T08:13:15Z", "evals_run": [5, 7], "runs_per_configuration": 3}, "runs": [{"eval_id": 5, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 19, "failed": 0, "total": 19, "time_seconds": 198.7, "tokens": 48405, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "A tasks-* directory (e.g. tasks-referral-api/) was created inside the outputs/ working directory.", "passed": true, "evidence": "Directory tasks-referrals-api/ exists inside outputs/."}, {"text": "The tasks directory contains a README.md index file.", "passed": true, "evidence": "README.md is present in tasks-referrals-api/ alongside the five task files."}, {"text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).", "passed": true, "evidence": "Six files total: 5 task files (01-05) plus README.md."}, {"text": "Task count is at least 4 (excluding README).", "passed": true, "evidence": "Five numbered task files: 01-walking-skeleton-issuance, 02-idempotent-redemption, 03-support-lookup-endpoint, 04-observability-and-runbook, 05-staged-rollout."}, {"text": "Task files follow the NN-<slug>.md pattern (01-, 02-, ... in dependency order).", "passed": true, "evidence": "All files are 01-..., 02-..., 03-..., 04-..., 05-... with sequential numbering matching the dependency order in README."}, {"text": "Every task file contains all six required fields: Title (heading), One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria \u2014 no extra fields.", "passed": true, "evidence": "Each of the five task files has a heading title plus exactly the six fields (One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria); no extra fields like Effort or Owner."}, {"text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.", "passed": true, "evidence": "Task bodies contain prose with backtick identifiers like `POST /codes`, table names, and metric names \u2014 no fenced code blocks, function signatures, or shell commands."}, {"text": "No task body references specific source file paths or module names (e.g. src/api/v2/referrals.py, no .py/.go/.js file paths).", "passed": true, "evidence": "Tasks reference logical entities (referrals-api service, referral_codes/referral_redemptions tables, credit-ledger-api) but no source file paths with .py/.go/.js extensions."}, {"text": "NFRs ride with feature tasks in their acceptance criteria. A standalone cross-cutting task is allowed ONLY when ALL its bullets cover service-wide concerns no single feature owns (e.g. service-wide saturation alarm, runbooks spanning multiple \u00a77 failure modes, alert-config deploys that fan out across endpoints). If any bullet of a cross-cutting task could ride with a specific feature task, the task fails this assertion \u2014 that is a punt, not legitimate cross-cutting.", "passed": true, "evidence": "NFRs ride with features (task 01 has p99 issuance latency; task 02 has 3x peak load test, idempotency latency, log fields, saturation telemetry; task 03 has p99 lookup latency). Task 04's bullets are each service-wide: log-convention enforcement spans all three endpoints (CI log-lint), alert deploy bundles three service-wide alarms (saturation > 70%, redemption error rate, ledger p99) that fan out across endpoints, runbook covers three \u00a77 failure modes as a single on-call document, and the metric-name registration is a service-wide naming concern. None of these ride cleanly with a single endpoint."}, {"text": "No task has 'write tests' / 'add test coverage' as its primary deliverable. Testing belongs in acceptance criteria, not as a separate task.", "passed": true, "evidence": "No standalone testing task exists; testing references live inside acceptance criteria (e.g. task 02 load test, task 01 collision-retry test)."}, {"text": "No task is a pure scaffolding task ('set up the package skeleton', 'create the module', 'init the repo') without shippable behavior.", "passed": true, "evidence": "Task 01 explicitly bundles scaffolding with the working POST /codes issuance path behind the launch flag \u2014 it ships user-visible behavior, not pure skeleton."}, {"text": "The README or chat summary surfaces the TDD's open questions (fraud policy \u00a710.1 and/or expiry boundary \u00a710.2) as BLOCKERS, not as tasks. No task has 'decide fraud policy' as a deliverable.", "passed": true, "evidence": "README has a dedicated section 'TDD sections that could not be turned into tasks (open questions block them)' covering \u00a710.1 and \u00a710.2; transcript labels them 'Blocked by open questions'. No abuse-check task exists."}, {"text": "The first task in dependency order is a vertical slice / walking skeleton \u2014 an end-to-end happy path that delivers user-visible behavior (e.g. issue + redeem flow with idempotency). It is NOT 'create the schema' / 'set up scaffolding' / 'add the table'.", "passed": true, "evidence": "Task 01 is 'Walking skeleton: issuance endpoint behind launch flag' \u2014 it delivers an end-to-end authenticated POST /codes issuance path that issues a real code, not pure schema/scaffolding."}, {"text": "The first task or a top-3-position task explicitly addresses idempotency under concurrent redemption \u2014 the load-bearing risk identified in the TDD (\u00a74.4, \u00a77).", "passed": true, "evidence": "Task 02 (position 2) is 'Idempotent redemption with credit-ledger integration' and explicitly covers concurrent redemption resolved by the (code) unique constraint mapped to 409, mobile double-tap retries returning the original result via (idempotency_key, code) uniqueness."}, {"text": "The task that integrates with credit-ledger-api has dedicated acceptance criteria about its failure modes (timeouts, retries with same idempotency key, behavior when ledger is down). External dependencies have their own risk surface.", "passed": true, "evidence": "Task 02 acceptance criteria include: ledger failure rolls back the transaction and no row persists; retrying with the same Idempotency-Key returns the original result and does not produce additional ledger calls; ledger outage produces a loud failure with safe retries on recovery."}, {"text": "Tasks declare dependencies via 'Depends on' field with concrete references to other tasks in this breakdown (not 'none' for every task).", "passed": true, "evidence": "Task 01 'Depends on: none'; tasks 02 and 03 depend on task 01 by name; task 04 depends on 02 and 03; task 05 depends on 02, 03, and 04 \u2014 concrete named references."}, {"text": "The dependency graph is not a single serial chain. After the foundation/walking-skeleton task, at least 2 tasks are independently startable (fan-out shape).", "passed": true, "evidence": "After task 01 ships, tasks 02 and 03 both depend only on 01 and are independently startable (README and transcript both highlight this fan-out)."}, {"text": "The transcript or chat summary contains an acknowledgement line confirming the TDD was read end-to-end (e.g. 'Read the TDD at ...').", "passed": true, "evidence": "Transcript opens with 'Read the TDD at `/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md`. Covers a new referrals-api synchronous service with three endpoints...'."}, {"text": "The transcript chat summary names the destination (local directory path) and the task count, and any open-question blockers.", "passed": true, "evidence": "Transcript states 'Wrote the breakdown to `./tasks-referrals-api/` (5 task files plus a README index)' and has a 'Blocked by open questions' section covering both \u00a710.1 and \u00a710.2."}], "notes": []}, {"eval_id": 7, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 0.8947368421052632, "passed": 17, "failed": 2, "total": 19, "time_seconds": 235.4, "tokens": 52852, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "A tasks-* directory (e.g. tasks-logsql-cli/) was created inside outputs/.", "passed": true, "evidence": "outputs/tasks-logsql-cli/ exists with 9 task files plus README."}, {"text": "The tasks directory contains a README.md index.", "passed": true, "evidence": "tasks-logsql-cli/README.md is present and indexes all 9 tasks with dependency graph and notes."}, {"text": "Total files inside tasks-*/ is between 5 and 13 (\u2264 12 tasks + 1 README).", "passed": true, "evidence": "10 files total (9 tasks + README), within the 5-13 range."}, {"text": "Task count is at least 4 (excluding README).", "passed": true, "evidence": "9 task files, well above the floor of 4."}, {"text": "Every task file contains all six required fields: Title, One-liner, Composes, TDD sections addressed, Depends on, Acceptance criteria.", "passed": true, "evidence": "Spot-checked all 9 task files: each has a title heading, plus bolded One-liner, Composes, TDD sections addressed, Depends on, and Acceptance criteria sections."}, {"text": "No task file contains code blocks, function signatures, pseudocode, or shell commands inside its body.", "passed": false, "evidence": "Task 01 acceptance criteria contains the shell command `printf '{\"a\":1}\\n{\"a\":2}\\n' | logsql 'SELECT a WHERE a > 1 LIMIT 10'`, and task 09 contains shell commands `brew install <tap>/logsql` and `brew uninstall logsql`. These are shell command invocations, which the rule forbids."}, {"text": "No task body references specific source file paths (e.g. 'cmd/logsql/main.go', 'pkg/parser/parser.go', 'src/' paths).", "passed": true, "evidence": "No source-tree paths anywhere; tasks refer to operators, AST, and flags, not file paths."}, {"text": "No task has 'decide on language' or 'choose Go vs Python' as a deliverable. The TDD already decided Go; tasks must respect that decision.", "passed": true, "evidence": "All tasks treat Go as decided (e.g. task 01 specifies 'statically-linked Go binary', task 02 says 'Hand-written recursive-descent parser')."}, {"text": "No task asks to decide parser strictness. The TDD already decided strict.", "passed": true, "evidence": "Task 02 implements strict mode as a hard decision: 'any construct outside the documented subset is a parse error, never a permissive best-effort'."}, {"text": "No task has 'write tests' or 'add test coverage' as its primary deliverable.", "passed": true, "evidence": "No task is dedicated to testing; testing is implied by per-task acceptance criteria."}, {"text": "No task is a standalone 'set up the project skeleton' / 'init Go module' / 'create the package' task \u2014 scaffolding is folded into the first feature task.", "passed": true, "evidence": "Task 01 is a walking skeleton that ships end-to-end functionality (SELECT/WHERE/LIMIT, CSV, cold-start benchmark, exit codes); no standalone scaffolding task."}, {"text": "The breakdown does NOT consist of horizontal layers ('implement parser', 'implement executor', 'implement output formatter' as 3 separate tasks). If it does, that's a major mindset failure.", "passed": true, "evidence": "Task 01 is a vertical end-to-end walking skeleton, and subsequent tasks add features (GROUP BY, ORDER BY, JSON output) rather than horizontal layers. Task 02 (parser) is a swap-in of the throwaway parser introduced by task 01, not a standalone layer."}, {"text": "The first task in dependency order is a walking skeleton \u2014 a minimal end-to-end CLI that reads JSON-lines from STDIN and emits output for the simplest SELECT * WHERE LIMIT case. NOT 'implement the parser' alone.", "passed": true, "evidence": "Task 01 is explicitly titled 'Walking skeleton: streaming SELECT/WHERE/LIMIT with CSV output' and ships an end-to-end binary streaming JSON-lines from STDIN to CSV STDOUT."}, {"text": "NFRs ride with feature tasks in their acceptance criteria. Specifically: cold-start latency is owned by the walking skeleton's acceptance criteria; throughput is owned by the operator-pipeline / SELECT-WHERE feature task; memory budget is owned by the GROUP BY and ORDER BY tasks. There is NO standalone 'performance benchmarks' / 'CI benchmarks' / 'address NFRs' task \u2014 each of those NFRs has a clear feature owner and pulling them out is the punt this rule exists to prevent.", "passed": false, "evidence": "Cold-start is correctly owned by task 01 and memory budget is correctly owned by tasks 03/04, but task 07 'Land the 1 GB throughput benchmark and synthetic fixture' is a standalone throughput-NFR task. The README itself describes it as a '1 throughput-NFR task', confirming throughput was pulled out instead of riding with the walking skeleton / SELECT-WHERE feature. Partial improvement vs prior iterations but still violates the sharpened rule."}, {"text": "The exit-code convention (including the deliberate exit 1 for zero-rows-matched) appears in the acceptance criteria of the task that introduces it.", "passed": true, "evidence": "Task 01 acceptance criteria includes 'A query that matches zero rows exits 1' and the full 0/1/2/3 convention wired end-to-end."}, {"text": "The task that implements GROUP BY / ORDER BY (the blocking operators) has memory-budget enforcement and the named-runtime-error behavior in its acceptance criteria.", "passed": true, "evidence": "Task 03 requires 'A GROUP BY whose accumulated state exceeds --max-memory exits 3 with a STDERR message that names the operator (aggregate)'; task 04 has the equivalent for the sort operator."}, {"text": "If the breakdown depends on the unresolved SQL-subset open question (\u00a710.1), it is surfaced as a BLOCKER in the README/summary \u2014 not invented as a task.", "passed": true, "evidence": "README has an 'Open questions blocking tasks' section that names \u00a710.1 and explicitly says no new task should be written until sign-off lands: 'Do not write it until the sign-off lands \u2014 that decision is owed to the TDD, not to this breakdown.'"}, {"text": "The transcript contains an acknowledgement line confirming the TDD was read end-to-end.", "passed": true, "evidence": "Transcript opens with 'Read the TDD at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md.' followed by a summary of the design, confirming end-to-end read."}, {"text": "The chat summary names the local directory destination and the task count.", "passed": true, "evidence": "Transcript states 'Wrote 9 tasks to `./tasks-logsql-cli/` plus a README index' and a Destination section reiterates '`./tasks-logsql-cli/` in the working directory \u2014 9 task markdown files plus `README.md`'."}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 0.9474, "stddev": 0.0744, "min": 0.8947, "max": 1.0}, "time_seconds": {"mean": 217.05, "stddev": 25.9508, "min": 198.7, "max": 235.4}, "tokens": {"mean": 50628.5, "stddev": 3144.5039, "min": 48405, "max": 52852}}, "delta": {"pass_rate": "+0.95", "time_seconds": "+217.1", "tokens": "+50628"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>
