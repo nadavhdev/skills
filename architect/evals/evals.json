@@ -1,0 +1,70 @@
+{
+  "skill_name": "architect",
+  "evals": [
+    {
+      "id": 0,
+      "name": "review-referral-api-tdd",
+      "prompt": "Can you give me an architect review of the referral feature design before we take it to breakdown? The TDD is at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md and the PRD it's supposed to satisfy is at /Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md. I want a real principal/staff-level read on whether this design is sound and grounded, not a rubber stamp — but also don't invent problems if it's solid. Is it ready to build?",
+      "expected_output": "Invokes the architect skill (TDD review). Reads PRD then TDD before forming opinions; pins the workload type as API serving (prefers the TDD's declared classification) and loads the API review aspects + tech-lead API template as the rubric. Produces a structured JSON review (verdict SIGN_OFF | REQUEST_CHANGES, round 1, summary, findings[] with id/severity/area/summary/detail/anchor). Findings are calibrated (a few sharp ones, not a wall) and EACH non-trivial finding is anchored to a PRD section, a TDD section, or a named failure mode — no taste-only findings. Surfaces real architect-level concerns where the TDD under-covers them: fraud / self-referral / multi-account abuse, idempotency on the redemption write, Stripe-credit-failure handling, code-expiry, code-collision — conceding where the TDD already handles them. Applies the simplification lens and the NFR-rigor lens (slogan detection / Verification leg / latency-budget-sums-under-target where applicable), using specific area tags (e.g. data, security, performance, operability). Does NOT re-author the design. Does NOT demand maximalist NFRs (no multi-region/DR for a modest internal API). Drives the loop or clearly states the next step.",
+      "assertions": [
+        "Invokes the architect skill (TDD review), not tech-lead TDD-authoring or implementation-review",
+        "Reads/uses both the PRD and the TDD (references content from each)",
+        "Emits a structured JSON review object with a verdict of exactly SIGN_OFF or REQUEST_CHANGES",
+        "Every blocker/major finding has a non-null anchor to a PRD section, TDD section, codebase fact, or named failure mode",
+        "All finding area tags are from the closed vocabulary (no invented tags)",
+        "Findings are calibrated — roughly 7 or fewer, not an exhaustive wall",
+        "Surfaces at least one genuine API-type gap (idempotency on writes, auth/trust-boundary, or latency budget) where the TDD under-covers it",
+        "Includes at least one NFR-rigor-flavored or quantification finding (slogan/missing-verification/budget-doesn't-sum) OR explicitly confirms NFRs are specified to target+mechanism+verification",
+        "Does NOT demand maximalist NFRs unwarranted by the PRD (no multi-region/DR/active-active for this internal API)",
+        "Does NOT rewrite or author the design (no full redesign in the output)"
+      ],
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-referral-api.md", "/Users/nhoze/.claude/skills/tech-lead/evals/prd-referral-api.md"]
+    },
+    {
+      "id": 1,
+      "name": "review-logsql-cli-tdd-calibration",
+      "prompt": "Architect review please on the logsql CLI design. TDD: /Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md, PRD: /Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md. This is a local CLI tool, so I mostly care about whether the design is right-sized and grounded — is it over-engineered anywhere, is there a simpler path, and did it miss anything that actually matters for a CLI? Don't bury me in NFRs that don't apply to a command-line tool.",
+      "expected_output": "Invokes the architect skill (TDD review), pins the type as CLI utility, and produces the structured JSON review. Demonstrates CALIBRATION: does NOT demand availability SLOs, multi-region, DR, or service-style observability for a CLI — and explicitly notes those NFRs are N/A for this workload (rather than silently). Leans into the lenses that matter for a CLI: simplification / over-engineering, PRD coverage (streaming vs whole-load, memory budget for GROUP BY / ORDER BY, exit-code behavior incl. zero-rows-matched, STDIN/pipe), codebase fit, and testability (fixture-based CLI tests per exit code). Flags any NFR stated as a slogan. Concedes the decisions the TDD already made well (Go-vs-Python, parser strictness) rather than re-litigating them. Findings anchored to PRD/TDD. Calibrated count. Verdict consistent with findings.",
+      "assertions": [
+        "Invokes the architect skill and pins the workload type as CLI utility",
+        "Emits a structured JSON review object with a verdict of exactly SIGN_OFF or REQUEST_CHANGES",
+        "Does NOT demand availability SLO, DR, or multi-region for the CLI (no such findings)",
+        "Treats inapplicable NFRs as explicitly N/A rather than flagging their absence",
+        "Includes at least one simplification or over-engineering consideration",
+        "Does NOT re-litigate decisions the TDD already settled (no 'choose Go vs Python' or 'pick parser strictness' finding)",
+        "Every blocker/major finding is anchored to a PRD section, TDD section, or named failure mode",
+        "Addresses a CLI must-have: explicit memory bound, exit-code table, or STDIN/pipe behavior",
+        "All finding area tags are from the closed vocabulary"
+      ],
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-logsql-cli.md", "/Users/nhoze/.claude/skills/tech-lead/evals/prd-logsql-cli.md"]
+    },
+    {
+      "id": 2,
+      "name": "no-prd-refusal-gate",
+      "prompt": "Hey, can you do an architect review of this TDD and tell me if the design is ready to build? It's at /Users/nhoze/.claude/skills/tech-lead/evals/tdd-order-events-consumer.md. I need a senior read on it before standup tomorrow.",
+      "expected_output": "Invokes the architect skill and HITS THE GATE: refuses to run the review because only the TDD was provided, with no PRD. The response (a) explicitly states it won't review a design without the PRD it's meant to satisfy, (b) explains briefly why (without the problem statement it can only check internal consistency, not whether the design solves the right problem), and (c) asks for the PRD (file path, inline paste, or URL). Does NOT produce a full JSON review. Does NOT fabricate PRD requirements. Does NOT silently proceed on internal-consistency-only.",
+      "assertions": [
+        "Refuses to run the review (no structured JSON review / no findings list produced)",
+        "Explicitly states it needs the PRD that the TDD claims to satisfy",
+        "Explains the reason (cannot judge problem-fit / solving-the-right-problem without the PRD)",
+        "Asks the user to provide the PRD (path, inline, or URL)",
+        "Does NOT fabricate or assume PRD requirements"
+      ],
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/tdd-order-events-consumer.md"]
+    },
+    {
+      "id": 3,
+      "name": "prd-only-routed-to-authoring",
+      "prompt": "I've got the PRD for the vendor inventory sync project at /Users/nhoze/.claude/skills/tech-lead/evals/prd-vendor-inventory-sync.md. Can you do an architect review of the design and tell me if it's solid and ready to break down?",
+      "expected_output": "Invokes the architect skill and HITS THE GATE in the other direction: the user supplied a PRD but no TDD, so there is no design to review yet. The response (a) explicitly distinguishes a PRD (the problem) from a TDD (the design under review), (b) explains an architect review needs an actual design to review against the PRD, and (c) routes the user to the tech-lead skill's TDD-authoring capability to write the design FIRST, then come back here to review it. Does NOT treat the PRD as a design and review it. Does NOT author the TDD itself. Does NOT fabricate a design.",
+      "assertions": [
+        "Refuses to run the review because no TDD/design was provided (only a PRD)",
+        "Explicitly distinguishes a PRD (problem statement) from a TDD (the design under review)",
+        "Routes the user to the tech-lead skill's TDD-authoring capability to write the design first",
+        "Does NOT treat the PRD as a design and review it",
+        "Does NOT author the TDD itself (architect reviews, it does not author)"
+      ],
+      "files": ["/Users/nhoze/.claude/skills/tech-lead/evals/prd-vendor-inventory-sync.md"]
+    }
+  ]
+}
